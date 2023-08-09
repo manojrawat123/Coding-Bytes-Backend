@@ -1,16 +1,10 @@
 from django.db import models
 from django.contrib.auth.models import BaseUserManager, AbstractBaseUser
-<<<<<<< HEAD
-
-class MyUserManager(BaseUserManager):
-    def create_user(self, email, name, phone, password=None):
-=======
 from company.models import Company
 from brand.models import Brand
 
 class MyUserManager(BaseUserManager):
     def create_user(self, email, name, phone, company , brand_ids,password=None):
->>>>>>> bbddb05 (Upadted Version 1.0)
         """
         Creates and saves a User with the given email, name, and phone.
         """
@@ -21,24 +15,15 @@ class MyUserManager(BaseUserManager):
             email=self.normalize_email(email),
             name=name,
             phone=phone,
-<<<<<<< HEAD
-=======
             company= company,
->>>>>>> bbddb05 (Upadted Version 1.0)
         )
 
         user.set_password(password)
         user.save(using=self._db)
-<<<<<<< HEAD
-        return user
-
-    def create_superuser(self, email, name, phone, password=None, password2= None):
-=======
         user.brand.add(*brand_ids)
         return user
 
     def create_superuser(self, email, name, phone,company,brand,  password=None, password2= None):
->>>>>>> bbddb05 (Upadted Version 1.0)
         """
         Creates and saves a superuser with the given email, name, and phone.
         """
@@ -50,11 +35,8 @@ class MyUserManager(BaseUserManager):
             name=name,
             phone=phone,
             password=password,
-<<<<<<< HEAD
-=======
             company = company, 
             brand= brand
->>>>>>> bbddb05 (Upadted Version 1.0)
         )
         user.is_admin = True
         user.save(using=self._db)
@@ -71,13 +53,8 @@ class MyUser(AbstractBaseUser):
     status = models.CharField(max_length=255)
     online_status = models.CharField(max_length=255)
     designation = models.CharField(max_length=255)
-<<<<<<< HEAD
-    company_id = models.CharField(max_length=255)
-    brand_allocated = models.CharField(max_length=255)
-=======
     company = models.ForeignKey(Company, on_delete=models.CASCADE)
     brand = models.ManyToManyField(Brand)
->>>>>>> bbddb05 (Upadted Version 1.0)
     user_location = models.CharField(max_length=255)
     last_login = models.DateTimeField(null=True, blank=True)
     user_create_date = models.DateTimeField(auto_now_add=True)
@@ -88,11 +65,7 @@ class MyUser(AbstractBaseUser):
     objects = MyUserManager()
 
     USERNAME_FIELD = "email"
-<<<<<<< HEAD
-    REQUIRED_FIELDS = ["name", "phone"]
-=======
     REQUIRED_FIELDS = ["name", "phone", "company", "brand"]
->>>>>>> bbddb05 (Upadted Version 1.0)
 
     def __str__(self):
         return self.email

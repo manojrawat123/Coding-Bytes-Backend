@@ -11,11 +11,7 @@ class Company(models.Model):
     CompanyPrimaryContactName = models.CharField(max_length=100)
     CompanyPrimaryContactPhone = models.BigIntegerField()
     CompanyPrimaryContactEmail = models.EmailField()
-<<<<<<< HEAD
-    CompanyStatus = models.CharField(max_length=20)
-=======
     CompanyStatus = models.CharField(max_length=20)
 
     def __str__(self):
         return self.CompanyName
->>>>>>> bbddb05 (Upadted Version 1.0)

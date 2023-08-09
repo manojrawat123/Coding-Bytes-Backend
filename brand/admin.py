@@ -2,9 +2,6 @@ from django.contrib import admin
 from brand.models import Brand
 
 class BrandAdmin(admin.ModelAdmin):
-<<<<<<< HEAD
-    list_display = [field.name for field in Brand._meta.get_fields()]
-=======
     list_display = (
         'BrandShortCode',
         'Company',
@@ -37,6 +34,5 @@ class BrandAdmin(admin.ModelAdmin):
 
     search_fields = ('BrandShortCode', 'BrandName', 'BrandEmail')
     list_filter = ('Company',)  
->>>>>>> bbddb05 (Upadted Version 1.0)
 
 admin.site.register(Brand, BrandAdmin)

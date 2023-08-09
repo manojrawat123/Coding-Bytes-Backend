@@ -1,8 +1,4 @@
 from django.shortcuts import render
-<<<<<<< HEAD
-
-# Create your views here.
-=======
 from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework.views import APIView
 from myuser.renders import UserRenderer
@@ -65,4 +61,3 @@ class MyProfile(APIView):
         return Response(serializer.data, status=status.HTTP_200_OK)   
     
 
->>>>>>> bbddb05 (Upadted Version 1.0)

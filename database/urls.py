@@ -15,11 +15,6 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path
-<<<<<<< HEAD
-
-urlpatterns = [
-    path('admin/', admin.site.urls),
-=======
 from myuser.views import UserRegistrationView, MyLogin, MyProfile
 from lead.views import LeadAddView, LeadDetailView
 from django.urls import path
@@ -34,5 +29,4 @@ urlpatterns = [
     path('lead/', LeadAddView.as_view(), name='addlead'),
      path('lead/<int:pk>/', LeadDetailView.as_view(), name='lead-detail'),
      path('services/', ServiceListView.as_view(), name='service-list'),
->>>>>>> bbddb05 (Upadted Version 1.0)
 ]
