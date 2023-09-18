@@ -17,7 +17,7 @@ import os
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
-
+STATIC_DIR = os.path.join(BASE_DIR , "static")
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/4.0/howto/deployment/checklist/
@@ -28,7 +28,7 @@ SECRET_KEY = 'django-insecure-a#k41l67(wf)v-inazc1xr=p-21qq%m6(ezqgts11o0^x)e^zj
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ["munnapassword.pythonanywhere.com"]
+ALLOWED_HOSTS = []
 
 
 # Application definition
@@ -48,7 +48,17 @@ INSTALLED_APPS = [
     'myuser',
     'leadScource',
     'service',
-    'lead'
+    'lead',
+    'state',
+    'leadfollowup',
+    'leadlastfollowup',
+    'payment',
+    'paymenttype',
+    'paymentmode',
+    'customerstudent',
+    'convertedstudent',
+    'feetracer',
+    'navbar',
 ]
 
 MIDDLEWARE = [
@@ -138,6 +148,7 @@ STATIC_URL = 'static/'
 STATIC_FILES_DIRS = [BASE_DIR /  "static"]
 STATIC_ROOT = 'staticfiles'
 AUTH_USER_MODEL = 'myuser.MyUser'
+MEDIA_ROOT = BASE_DIR / 'media'
 
 # Email SetUp
 EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
@@ -175,7 +186,7 @@ SIMPLE_JWT = {
 
 PASSWORD_RESET_TIMEOUT=900          # 900 Sec = 15 Min
 
-
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:5173",
+    "http://127.1.1.0:5173",
 ]

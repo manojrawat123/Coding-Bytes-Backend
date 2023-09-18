@@ -10,20 +10,22 @@ from django.core.mail import send_mail
 from rest_framework.permissions import IsAuthenticated
 from lead.models import Lead
 from rest_framework.generics import RetrieveAPIView
+from datetime import datetime, timedelta
+from django.utils import timezone
 
 
 
 # Create your views here.
 class LeadAddView(APIView):
     renderer_classes = [UserRenderer]
-    # permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated]
     def post(self, request, format=None):
         serializer = LeadSerializer(data=request.data)
         if serializer.is_valid(raise_exception=True):
             email_from = settings.EMAIL_HOST_USER
             email = "positive.mind.123456789@gmail.com"
             recipient_list = [email,]
-            subject = "Lead Add Sucessfully"
+            subject = "Lead Add Sucessfully" 
             
             data = serializer.save()
             lead_name = serializer.data.get('LeadName', 'Student')
@@ -33,8 +35,12 @@ class LeadAddView(APIView):
                   {serializer}'''
             send_mail(subject, message, email_from, recipient_list)
             return Response({"msg": "Registration Sucessfully"})
-        
         return Response({"error": "Invalid Data" }, status=status.HTTP_400_BAD_REQUEST)
+    def get(self, request):
+        lead = Lead.objects.all() 
+        serializer = LeadSerializer(lead, many=True)
+        return Response(serializer.data)
+    
     
 class LeadDetailView(RetrieveAPIView):
     renderer_classes = [UserRenderer]

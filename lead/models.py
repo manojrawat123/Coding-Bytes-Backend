@@ -11,7 +11,7 @@ class Lead(models.Model):
     LeadLocation = models.CharField(max_length=100)
     LeadAddress = models.CharField(max_length=200)
     LeadSource = models.CharField(max_length=100)
-    LeadServiceInterested = models.ManyToManyField(Service)
+    LeadServiceInterested = models.ForeignKey(Service, on_delete=models.CASCADE)
     Brand = models.ForeignKey(Brand, on_delete=models.CASCADE)
     Company = models.ForeignKey(Company, on_delete=models.CASCADE)
     Profession = models.CharField(max_length=200)
@@ -26,4 +26,5 @@ class Lead(models.Model):
     LeadState = models.CharField(max_length=100)
     LeadAssignmentAlgo = models.CharField(max_length=100)
     LeadNextCallDate = models.DateField()
+    CourseName = models.CharField(max_length=300)
     # Add other fields for Lead model as needed

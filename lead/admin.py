@@ -14,6 +14,5 @@ class LeadAdmin(admin.ModelAdmin):
                      'LeadRepresentativeSecondary')
 
     # Add any related fields you want to search on
-    filter_horizontal = ('LeadServiceInterested',)
 
 admin.site.register(Lead, LeadAdmin)

@@ -10,9 +10,10 @@ class Service(models.Model):
     Company = models.ForeignKey(Company, on_delete=models.CASCADE)
     ServiceStatus = models.CharField(max_length=20)
     SERVICE_MODE_CHOICES = [
-        ('online', 'Online'),
-        ('offline', 'Offline'),
+        ('Online', 'Online'),
+        ('Offline', 'Offline'),
     ]
     serviceMode = models.CharField(max_length=10, choices=SERVICE_MODE_CHOICES)
     def __str__(self):
         return self.ServiceName
+        

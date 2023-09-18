@@ -9,8 +9,8 @@ from rest_framework.permissions import IsAuthenticated
 class ServiceListView(APIView):
     renderer_classes = [UserRenderer]
     permission_classes = [IsAuthenticated]
-    def get(self, request, format=None):
-        services = Service.objects.all()  # Retrieve all instances of the Service model
+    def get(self, request, brand_id, format=None):
+        services = Service.objects.filter(Brand_id=brand_id)  # Retrieve all instances of the Service model
         serializer = LeadSerializer(services, many=True)  # Serialize the queryset
         
         return Response(serializer.data, status=status.HTTP_200_OK)

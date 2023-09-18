@@ -29,14 +29,15 @@ class MyUserManager(BaseUserManager):
         """
         if password == password2:
             raise ValueError("Password Did't match")
+        companys = Company.objects.get(id=company)
         
         user = self.create_user(
             email=email,
             name=name,
             phone=phone,
             password=password,
-            company = company, 
-            brand= brand
+            company = companys, 
+            brand_ids= brand
         )
         user.is_admin = True
         user.save(using=self._db)
@@ -61,7 +62,6 @@ class MyUser(AbstractBaseUser):
     is_active = models.BooleanField(default=True)
     is_admin = models.BooleanField(default=False)
     
-
     objects = MyUserManager()
 
     USERNAME_FIELD = "email"
