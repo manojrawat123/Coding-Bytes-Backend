@@ -15,13 +15,8 @@ class PaymentList(APIView):
             serializer = PaymentSerializer(payments, many=True)
             return Response(serializer.data)
         elif id is not None:
-            # payments = Payment.objects.filter(lead_id = id)
-            # serializer = PaymentSerializer(payments, many= True)
-            # return Response(serializer.data)
             existing_payment_ids = Fee.objects.filter(payment_id__isnull=False).values_list('payment_id', flat=True)
-            # Get Payment objects for a specific lead_id excluding those with existing payment_id values
             payments = Payment.objects.filter(lead_id=id).exclude(payment_id__in=existing_payment_ids)
-            # Serialize the Payment queryset
             serializer = PaymentSerializer(payments, many=True)
             return Response(serializer.data)        
 
@@ -31,6 +26,14 @@ class PaymentList(APIView):
             serializer.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
+class PaymentByLead(APIView):
+    def get(self, request, id =None):
+        if id is not None:
+            payments = Payment.objects.filter(lead_id= id)
+            serializer = PaymentSerializer(payments, many=True)
+            return Response(serializer.data, status=status.HTTP_200_OK)  
+
 
 class PaymentDetail(RetrieveAPIView):
     queryset = Payment.objects.all()

@@ -4,10 +4,6 @@ from myuser.models import MyUser
 
 # Register your models here.
 class UserAdmin(BaseUserAdmin):
-
-    # The fields to be used in displaying the User model.
-    # These override the definitions on the base UserAdmin
-    # that reference specific fields on auth.User.
     list_display = ["email", "name", "phone", "is_admin",  "company"]
     list_filter = ["is_admin"]
     fieldsets = [
@@ -16,14 +12,12 @@ class UserAdmin(BaseUserAdmin):
         ("Permissions", {"fields": ["is_admin"]}),
         ("Additional Info", {"fields": ["status", "online_status", "designation", "user_location", "last_login", ]}),
     ]
-    # add_fieldsets is not a standard ModelAdmin attribute. UserAdmin
-    # overrides get_fieldsets to use this attribute when creating a user.
     add_fieldsets = [
         (
             None,
             {
                 "classes": ["wide"],
-                "fields": ["email", "name", "phone", "password1", "password2" ,"company", "brand"],
+                "fields": ["email", "name", "phone", "password1", "password2" ,"company", "brand","dob", "doj","user_type"],
             },
         ),
     ]
@@ -32,5 +26,4 @@ class UserAdmin(BaseUserAdmin):
     filter_horizontal = []
 
 
-# Now register the new UserAdmin...
 admin.site.register(MyUser, UserAdmin)

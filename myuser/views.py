@@ -2,11 +2,12 @@ from django.shortcuts import render
 from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework.views import APIView
 from myuser.renders import UserRenderer
-from myuser.serializers import MyUserSerializers, MyUserLoginSerializer, UserProfileSerializer
+from myuser.serializers import MyUserRegisterSerializer, MyUserSerializers, MyUserLoginSerializer, UserProfileSerializer
 from rest_framework.response import Response
 from rest_framework import status
 from django.contrib.auth import authenticate
 from rest_framework.permissions import IsAuthenticated
+from myuser.models import MyUser
 
 
 # Create your views here.
@@ -21,12 +22,44 @@ def get_token_for_user(user):
 # Create Your Registration User Code Start Here
 class UserRegistrationView(APIView):
     renderer_classes = [UserRenderer]
+    permission_classes = [IsAuthenticated]
+    def get(self, request, format=None):
+        # Retrieve all users from the database
+        my_all_user = MyUser.objects.all()
+        serializer = MyUserRegisterSerializer(my_all_user, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+    
     def post(self, request, format=None):
-        serializer = MyUserSerializers(data=request.data)
+        serializer = MyUserRegisterSerializer(data=request.data)
         if serializer.is_valid(raise_exception=True):
             data = serializer.save()
             return Response({"msg": "Registration Sucessfully"})
         return Response({"error": "Invalid Data" }, status=status.HTTP_400_BAD_REQUEST)
+
+
+class UserRegisterViewByID(APIView):
+    def get(self, request, id = None):
+        if id is not None:
+            data = MyUser.objects.get(id=id)
+            serializers = MyUserRegisterSerializer(data)
+            return Response(serializers.data, status=status.HTTP_200_OK)        
+        return Response({"error" : "Error Please Provide ID"})
+
+
+    def put(self, request, id=None):
+        try:
+            myuser = MyUser.objects.get(id=id)
+        except MyUser.DoesNotExist:
+            return Response({"error": "Converted Student Id not found"}, status=status.HTTP_404_NOT_FOUND)
+
+        serializer = MyUserRegisterSerializer(myuser, data=request.data ,partial=True)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+
 
 
     

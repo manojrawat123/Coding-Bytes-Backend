@@ -36,7 +36,17 @@ class FeeTrackerList(APIView):
             return Response(serializer.data)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-        
+
+class FeeTracerByPaymentID(APIView):
+    def get(self, request, id=None):
+        if id is not None:
+            customer = Fee.objects.filter(payment_id=id)
+            serializer = FeesSerializerGet(customer, many=True)
+            return Response(serializer.data)
+        else:
+            fee = Fee.objects.all()
+            serializer = FeesSerializerGet(fee, many=True)
+            return Response(serializer.data)      
 
 class FeeTrackekrkDetail(RetrieveAPIView):
     queryset = Fee.objects.all()

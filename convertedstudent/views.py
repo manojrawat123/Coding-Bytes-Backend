@@ -38,8 +38,3 @@ class ConvertedStudentList(APIView):
             serializer.save()
             return Response(serializer.data)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-# class ConvertedStudentDetail(RetrieveAPIView):
-#     queryset = convertedstudent.objects.all()
-#     serializer_class = ConvertedStudentSerializer
-

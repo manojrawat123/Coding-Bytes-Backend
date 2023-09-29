@@ -2,7 +2,8 @@ from django.db import models
 from django.contrib.auth.models import BaseUserManager, AbstractBaseUser
 from company.models import Company
 from brand.models import Brand
-
+from datetime import date
+ 
 class MyUserManager(BaseUserManager):
     def create_user(self, email, name, phone, company , brand_ids,password=None):
         """
@@ -61,7 +62,15 @@ class MyUser(AbstractBaseUser):
     user_create_date = models.DateTimeField(auto_now_add=True)
     is_active = models.BooleanField(default=True)
     is_admin = models.BooleanField(default=False)
+    user_type = models.CharField(max_length=225, choices=[
+        ("Caller", "Caller"),
+        ("View", "View"),
+        ("Admin", "Admin"),
+        ("Staff", "Staff")
     
+    ])
+    dob = models.DateField()
+    doj = models.DateField()
     objects = MyUserManager()
 
     USERNAME_FIELD = "email"
