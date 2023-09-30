@@ -26,7 +26,7 @@ from paymenttype.views import MyPaymentType
 from leadlastfollowup.views import LeadLastFollowupListCreateView,LeadLastFollowupDetailView
 from customerstudent.views import CustomerList
 from convertedstudent.views import ConvertedStudentList
-from feetracer.views import FeeTrackerList,FeeTracerByPaymentID
+from feetracer.views import FeeTrackerList,FeeTracerByPaymentID,FeeTrackekrkDetail
 from leadlastfollowup.views import LeadLastFollowUpByLeadId
 from navbar.views import MyNavbar
 from django.conf.urls.static import static
@@ -34,7 +34,7 @@ from django.conf import settings
 from refundfees.views import FeesRefundApiView
 from paymentlink.views import PaymentLinkView, PaymentLinkViewGetUrl
 from batch.views import BatchApiView
-
+# 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path("register/", UserRegistrationView.as_view(), name="register"),
@@ -59,6 +59,7 @@ urlpatterns = [
     path('convertedlead/', ConvertedStudentList.as_view(), name="ConvertedStudentList"),
     path('convertedlead/<int:id>/', ConvertedStudentList.as_view(), name="ConvertedStudentList"),
     path('feetracer/', FeeTrackerList.as_view(), name="Feetracer"),
+    path('feetracerpost/', FeeTrackekrkDetail.as_view(), name="FeePost"),
     path('feetracer/<int:id>/', FeeTrackerList.as_view(), name="Feetracer"),
     path('navbar/', MyNavbar.as_view(), name="navbar"),
     path('refundfees/',FeesRefundApiView.as_view(), name="refundfees"),

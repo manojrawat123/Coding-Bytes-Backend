@@ -4,7 +4,7 @@ from rest_framework import status
 from rest_framework.generics import RetrieveAPIView
 from feetracer.models import Fee
 from feetracer.serializers import FeesSerializerGet, FeesSerializerPost
-
+from rest_framework import generics
 
 
 class FeeTrackerList(APIView):
@@ -48,6 +48,7 @@ class FeeTracerByPaymentID(APIView):
             serializer = FeesSerializerGet(fee, many=True)
             return Response(serializer.data)      
 
-class FeeTrackekrkDetail(RetrieveAPIView):
+class FeeTrackekrkDetail(generics.ListCreateAPIView):
     queryset = Fee.objects.all()
     serializer_class = FeesSerializerPost
+
