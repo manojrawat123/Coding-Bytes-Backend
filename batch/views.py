@@ -20,5 +20,14 @@ class BatchApiView(APIView):
             data = serializer.save()
             return Response(serializer.data,status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status= status.HTTP_400_BAD_REQUEST)
+    
+class BatchApiViewById(APIView):
+    permission_classes = [IsAuthenticated]
+    def put(self , request, id=None):
+        batch = Batch.objects.get(BatchID = id)
+        serializers = BatchSerializers(batch, data= request.data, partial=True)
+        if serializers.is_valid():
+            serializers.save()
+            return Response(serializers.data, status=status.HTTP_201_CREATED)
 
         

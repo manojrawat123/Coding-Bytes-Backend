@@ -12,7 +12,6 @@ class ConvertedStudentList(APIView):
             customer = convertedstudent.objects.filter(ConvertedID=id)
             serializer = ConvertedStudentSerializer(customer, many=True)
             return Response(serializer.data)
-        
         else:
             customers = convertedstudent.objects.all()
             serializer = ConvertedStudentSerializer(customers, many=True)

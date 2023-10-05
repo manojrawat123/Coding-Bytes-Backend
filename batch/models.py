@@ -22,3 +22,4 @@ class Batch(models.Model):
     BatchTime = models.TimeField()
     BatchEndTime = models.TimeField()
     Status = models.BooleanField(default=True)
+

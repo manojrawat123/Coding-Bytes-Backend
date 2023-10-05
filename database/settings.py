@@ -64,6 +64,7 @@ INSTALLED_APPS = [
     'refundfees',
     'paymentlink',
     'batch',
+    'batchstudent',
 ]
 
 MIDDLEWARE = [

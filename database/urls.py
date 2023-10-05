@@ -33,7 +33,9 @@ from django.conf.urls.static import static
 from django.conf import settings
 from refundfees.views import FeesRefundApiView
 from paymentlink.views import PaymentLinkView, PaymentLinkViewGetUrl
-from batch.views import BatchApiView
+from batch.views import BatchApiView, BatchApiViewById
+from batchstudent.views import BatchStudentListView, BatchStudentByConvertedIdView
+from brand.views import BrandApiViewById
 # 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -42,6 +44,7 @@ urlpatterns = [
     path("login/", MyLogin.as_view(), name="login"),
     path('profile/', MyProfile.as_view(), name='profile'),
     path('lead/', LeadAddView.as_view(), name='addlead'),
+    path('brand/<int:id>/', BrandApiViewById.as_view(), name='brand'),
     path('lead/<int:pk>/', LeadDetailView.as_view(), name='lead-detail'),
     path('services/<int:brand_id>/', ServiceListView.as_view(), name='service-list'),
     path('leadfollowup/', LeadFollowupListCreateView.as_view(), name='leadfollowup-list'),
@@ -67,6 +70,9 @@ urlpatterns = [
     path('getfeesdetailspaymentid/<int:id>/',FeeTracerByPaymentID.as_view(), name="getfeesdetailbypaymentid"),
     path('paymentlink/',PaymentLinkView.as_view(), name="payment_link_view"),
     path('paymentlinkurl/',PaymentLinkViewGetUrl.as_view(), name="payment_link_view"),
-    path('batch/', BatchApiView.as_view(), name="batch_link_view")
+    path('batch/', BatchApiView.as_view(), name="batch_link_view"),
+    path('batch/<int:id>/', BatchApiViewById.as_view(), name="batch_api_view_by_id"),
+    path('batchstudent/', BatchStudentListView.as_view(), name="batch_student"),
+    path('batchstudent/<int:id>/',BatchStudentByConvertedIdView.as_view(),name="batchstudentbyconvertedid" )
 ] + static(settings.MEDIA_URL, document_root= settings.MEDIA_ROOT)
 
