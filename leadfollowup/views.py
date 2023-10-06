@@ -9,7 +9,7 @@ from rest_framework.response import Response
 from rest_framework import status
 
 class LeadFollowupListCreateView(APIView):
-    # permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated]
     def get(self, request, id=None):
         if id is not None:
             customer = LeadFollowUp.objects.filter(LeadID=id)
