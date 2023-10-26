@@ -16,7 +16,7 @@ class LeadFollowupSerializer(serializers.ModelSerializer):
         lead_event_date = data.get('LeadEventDate')
         lead_event_taken_by = data.get('LeadEventTakenBy')
         
-        if lead_phone_picked is None and lead_event is None:
+        if lead_phone_picked is None and lead_event is None and lead_status != "Fresh":
             raise serializers.ValidationError("Please select one option to proceed.")
         elif lead_phone_picked is not None and lead_event is not None:
             raise serializers.ValidationError("Only one of LeadPhonePicked or LeadEvent should be provided.")
@@ -28,8 +28,6 @@ class LeadFollowupSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError("Lead Event date Cannot be None")
         elif lead_event is not None and lead_event_taken_by is None:
             raise serializers.ValidationError('Please Select Who take Event')
-
         # Perform other validations or processing here if needed
         # ...
-
         return data

@@ -6,7 +6,6 @@ from convertedstudent.models import convertedstudent
 from convertedstudent.serializers import ConvertedStudentSerializer
 from django.shortcuts import get_object_or_404
 
-
 class ConvertedStudentList(APIView):
     def get(self, request, id=None):
         if id is not None:
@@ -17,6 +16,8 @@ class ConvertedStudentList(APIView):
             customers = convertedstudent.objects.all()
             serializer = ConvertedStudentSerializer(customers, many=True)
             return Response(serializer.data)
+
+
 
     def post(self, request):
         serializer = ConvertedStudentSerializer(data=request.data)

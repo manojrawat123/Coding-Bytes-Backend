@@ -27,7 +27,7 @@ from leadlastfollowup.views import LeadLastFollowupListCreateView,LeadLastFollow
 from customerstudent.views import CustomerList
 from convertedstudent.views import ConvertedStudentList
 from feetracer.views import FeeTrackerList,FeeTracerByPaymentID,FeeTrackekrkDetail
-from leadlastfollowup.views import LeadLastFollowUpByLeadId
+from leadlastfollowup.views import LeadLastFollowUpByLeadId, LeadLastFollowUpNotConverted
 from navbar.views import MyNavbar
 from django.conf.urls.static import static
 from django.conf import settings
@@ -36,18 +36,27 @@ from paymentlink.views import PaymentLinkView, PaymentLinkViewGetUrl
 from batch.views import BatchApiView, BatchApiViewById
 from batchstudent.views import BatchStudentListView, BatchStudentByConvertedIdView
 from brand.views import BrandApiViewById
-# 
+from emailtemplate.views import EmailTemplateView
+from emaillog.views import EmailLogSheduleOnlyEmail, SaveEmailInLog
+from leadScource.views import LeadScourceApiView,LeadScourceApiById
+from messagetemplate.views import MessageTemplateView
+from messagelog.views import MessageLogSheduleOnlyEmail, SaveMessageInLog
+
 urlpatterns = [
     path('admin/', admin.site.urls),
     path("register/", UserRegistrationView.as_view(), name="register"),
-    path("register/<int:id>/", UserRegisterViewByID.as_view(), name="register"),
+    path("register/<int:id>/", UserRegisterViewByID.as_view(), name="register_by_id"),
     path("login/", MyLogin.as_view(), name="login"),
     path('profile/', MyProfile.as_view(), name='profile'),
     path('lead/', LeadAddView.as_view(), name='addlead'),
+    path('lead/<int:id>/', LeadAddView.as_view(), name='update-lead'),
     path('brand/<int:id>/', BrandApiViewById.as_view(), name='brand'),
     path('lead/<int:pk>/', LeadDetailView.as_view(), name='lead-detail'),
+    path('leadscource/', LeadScourceApiView.as_view(), name='lead-scource-view'),
+    path('leadscource/<int:id>/', LeadScourceApiById.as_view(), name='lead-scource-view-by-id'),
     path('services/<int:brand_id>/', ServiceListView.as_view(), name='service-list'),
     path('leadfollowup/', LeadFollowupListCreateView.as_view(), name='leadfollowup-list'),
+    path('leadnotconverted/', LeadLastFollowUpNotConverted.as_view(), name='leadfollowup-not-converted-list'),
     path('leadfollowup/<int:id>/', LeadFollowupListCreateView.as_view(), name='leadfollowup-detail'),
     path('leadlastfollowup/', LeadLastFollowupListCreateView.as_view(), name='leadlastfollowup-list'),
     path('leadlastfollowup/<int:pk>/', LeadLastFollowupListCreateView.as_view(), name='leadlastfollowup-detail'),
@@ -73,6 +82,11 @@ urlpatterns = [
     path('batch/', BatchApiView.as_view(), name="batch_link_view"),
     path('batch/<int:id>/', BatchApiViewById.as_view(), name="batch_api_view_by_id"),
     path('batchstudent/', BatchStudentListView.as_view(), name="batch_student"),
-    path('batchstudent/<int:id>/',BatchStudentByConvertedIdView.as_view(),name="batchstudentbyconvertedid" )
+    path('batchstudent/<int:id>/',BatchStudentByConvertedIdView.as_view(),name="batchstudentbyconvertedid"),
+    path('emailtemplate/',EmailTemplateView.as_view(),name="EmailTemplate"),
+    path("emailshedule/", EmailLogSheduleOnlyEmail.as_view(), name="Email Shedule Only Email"),
+    path("saveemail/", SaveEmailInLog.as_view(), name="Save Email In Log"),
+    path('messagetemplate/',MessageTemplateView.as_view(),name="MessageTemplate"),
+    path("messageshedule/", MessageLogSheduleOnlyEmail.as_view(), name="Message Shedule Only Email"),
+    path("savemessage/", SaveMessageInLog.as_view(), name="Save Message In Log"),
 ] + static(settings.MEDIA_URL, document_root= settings.MEDIA_ROOT)
-

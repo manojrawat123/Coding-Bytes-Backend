@@ -10,15 +10,31 @@ class Lead(models.Model):
     LeadEmail = models.EmailField()
     LeadLocation = models.CharField(max_length=100)
     LeadAddress = models.CharField(max_length=200)
+    # LeadScourceId = models.ForeignKey()
     LeadSource = models.CharField(max_length=100)
-    LeadServiceInterested = models.ForeignKey(Service, on_delete=models.CASCADE)
+    LeadServiceInterested = models.ManyToManyField(Service)
     Brand = models.ForeignKey(Brand, on_delete=models.CASCADE)
     Company = models.ForeignKey(Company, on_delete=models.CASCADE)
     Profession = models.CharField(max_length=200)
     PageSource = models.CharField(max_length=100)
     Plateform = models.CharField(max_length=100)
     LeadDateTime = models.DateTimeField()
-    LeadStatus = models.CharField(max_length=50)
+    LeadStatus = models.CharField(max_length=50, choices=[
+            ('Fresh', 'Fresh'),
+            ('Ready To Enroll', 'Ready To Enroll'),
+            ('Visit scheduled', 'Visit scheduled'),
+            ('Demo scheduled', 'Demo scheduled'),
+            ("Highly Intersted", "Highly Intersted"),
+            ("Least Intersted", "Least Intersted"),
+            ("Distance Issue", "Distance Issue"),  
+            ("Pricing Issue", "Pricing Issue"),    
+            ("Already Taken Service", "Already Taken Service"),  
+            ("Quality Issue", "Quality Issue"),    
+            ("Not Interested Anymore", "Not Interested Anymore"),  
+            ("Did Not Enquire", "Did Not Enquire"),  
+            ("Only Wanted Information", "Only Wanted Information"),  
+            ("Other", "Other"), 
+        ])
     DND = models.BooleanField(default=False)
     LeadRepresentativePrimary = models.CharField(max_length=100)
     LeadRepresentativeSecondary = models.CharField(max_length=100)

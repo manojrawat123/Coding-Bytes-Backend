@@ -7,6 +7,7 @@ from leadfollowup.serializer import LeadFollowupSerializer
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
+# from convertedstudent.models import convertedstudent
 
 class LeadFollowupListCreateView(APIView):
     permission_classes = [IsAuthenticated]
@@ -26,6 +27,13 @@ class LeadFollowupListCreateView(APIView):
             serializer.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+# class LeadFollowUpNotConverted(APIView):
+#     def get(self, request):
+#         followups_not_converted = LeadFollowUp.objects.exclude(LeadID__in=convertedstudent.objects.values('LeadID'))
+#         serializer = LeadFollowupSerializer(followups_not_converted, many=True)
+#         return Response(serializer.data)
+
 
 class LeadFollowupDetailView(generics.RetrieveUpdateDestroyAPIView):
     renderer_classes = [UserRenderer]

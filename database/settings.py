@@ -65,6 +65,12 @@ INSTALLED_APPS = [
     'paymentlink',
     'batch',
     'batchstudent',
+    'emaillog',
+    'emailshedule',
+    'emailtemplate',
+    'messagelog',
+    'messageshedule',
+    'messagetemplate'
 ]
 
 MIDDLEWARE = [
@@ -163,7 +169,16 @@ EMAIL_HOST = "smtp.gmail.com"
 EMAIL_USE_TLS = True
 EMAIL_PORT = 587
 EMAIL_HOST_USER ='positive.mind.123456789@gmail.com'
-EMAIL_HOST_PASSWORD = "dbcnxzjekioxtufg"
+EMAIL_HOST_PASSWORD = "gimrylpgsinopbil"
+DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+
+# Message Configrations
+# settings.py
+TWILIO_ACCOUNT_SID = 'ACfb3876453d28ce18b86eaf4e1cd80cd3'
+TWILIO_AUTH_TOKEN = 'df76f79cb36bf124737af8623663d70a'
+TWILIO_PHONE_NUMBER = '+917703829419'
+
 
 
 # Default primary key field type
@@ -171,24 +186,19 @@ EMAIL_HOST_PASSWORD = "dbcnxzjekioxtufg"
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-
 # JWT Settings
 SIMPLE_JWT = {
     'ACCESS_TOKEN_LIFETIME': timedelta(minutes=60*24*2),
     'REFRESH_TOKEN_LIFETIME': timedelta(days=2),
-
     'AUTH_HEADER_TYPES': ('Bearer',),
     'AUTH_HEADER_NAME': 'HTTP_AUTHORIZATION',
     'USER_ID_FIELD': 'id',
     'USER_ID_CLAIM': 'user_id',
     'USER_AUTHENTICATION_RULE': 'rest_framework_simplejwt.authentication.default_user_authentication_rule',
-
     'AUTH_TOKEN_CLASSES': ('rest_framework_simplejwt.tokens.AccessToken',),
     'TOKEN_TYPE_CLAIM': 'token_type',
     'TOKEN_USER_CLASS': 'rest_framework_simplejwt.models.TokenUser',
-
     'JTI_CLAIM': 'jti',
-
 }
 
 PASSWORD_RESET_TIMEOUT=900          # 900 Sec = 15 Min

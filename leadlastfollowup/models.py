@@ -3,6 +3,7 @@ from company.models import Company
 from brand.models import Brand
 from myuser.models import MyUser
 from lead.models import Lead       
+from service.models import Service    
 
 
 # Create your models here.
@@ -22,6 +23,7 @@ class LeadLastFollowUp(models.Model):
     LeadStatus = models.CharField(
         max_length=2000,
         choices=[
+            ('Fresh', 'Fresh'),
             ('Ready To Enroll', 'Ready To Enroll'),
             ('Visit scheduled', 'Visit scheduled'),
             ('Demo scheduled', 'Demo scheduled'),
@@ -53,5 +55,6 @@ class LeadLastFollowUp(models.Model):
     LeadEventTakenBy = models.CharField(max_length=100,null=True, blank=True)
     LeadFeeOffered = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
     LeadReasonPhoneNotPicked = models.TextField(null=True, blank=True)
+    LeadServiceInterested = models.ManyToManyField(Service)
 
    
