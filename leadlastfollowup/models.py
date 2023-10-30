@@ -15,7 +15,7 @@ class LeadLastFollowUp(models.Model):
     LeadFollowupCreatedDate = models.DateTimeField(auto_now_add=True)
     LeadPhonePicked = models.CharField(
         max_length=2000,
-        choices=[
+        choices=[ 
             ("Yes", "Yes"),
             ("No", "No")
         ],

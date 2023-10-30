@@ -11,19 +11,16 @@ from leadScource.serializers import LeadScourceSerializers
 class LeadScourceApiView(APIView):
     permission_classes = [IsAuthenticated]
     def get(self, format=None):
-        navbar = LeadSource.objects.all()
-        serializer = LeadScourceSerializers(navbar,many=True)
+        leadscource = LeadSource.objects.all()
+        serializer = LeadScourceSerializers(leadscource,many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
 
 class LeadScourceApiById(APIView):
-    permission_classes = [IsAuthenticated]
+    # permission_classes = [IsAuthenticated]
     def get(self, format=None, id = None):
         if (id == None): 
             return Response({"msg":"method not allowed"})
-        navbar = LeadSource.objects.filter(Brand = id)
-        serializer = LeadScourceSerializers(navbar,many=True)
+        leadScource = LeadSource.objects.filter(Brand = id)
+        serializer = LeadScourceSerializers(leadScource,many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
-
-
-

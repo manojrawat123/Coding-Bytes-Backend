@@ -60,6 +60,7 @@ class MyUser(AbstractBaseUser):
     user_location = models.CharField(max_length=255)
     last_login = models.DateTimeField(null=True, blank=True)
     user_create_date = models.DateTimeField(auto_now_add=True)
+    is_superuser = models.BooleanField(default=False)
     is_active = models.BooleanField(default=True)
     is_admin = models.BooleanField(default=False)
     user_type = models.CharField(max_length=225, choices=[

@@ -50,12 +50,11 @@ class LeadFollowUp(models.Model):
     )
     LeadEventDate = models.DateTimeField(null=True, blank=True)
     LeadRep = models.ForeignKey(MyUser, on_delete=models.CASCADE)
-    leadRepName = models.CharField(max_length=200)
     # LeadFollowupRep = models.ForeignKey(MyUser, on_delete=models.CASCADE)
     LeadEventTakenBy = models.CharField(max_length=100)
     LeadFeeOffered = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
     LeadReasonPhoneNotPicked = models.TextField(null=True, blank=True)
-    LeadServiceInterested = models.ManyToManyField(Service)
+    LeadServiceInterested = models.ForeignKey(Service,on_delete=models.CASCADE)
 
     def __str__(self):
         return f"Lead {self.LeadID}"

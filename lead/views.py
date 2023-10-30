@@ -12,13 +12,17 @@ from lead.models import Lead
 from rest_framework.generics import RetrieveAPIView
 from datetime import datetime, timedelta
 from django.utils import timezone
+from django.db.models import Q
+from django.core.exceptions import ObjectDoesNotExist
 
 # Create your views here.
 class LeadAddView(APIView):
     renderer_classes = [UserRenderer]
     permission_classes = [IsAuthenticated]
     def post(self, request, format=None):
+        
         serializer = LeadSerializer(data=request.data)
+
         if serializer.is_valid(raise_exception=True):
             try:
                 # Save data to the database
@@ -50,12 +54,25 @@ class LeadAddView(APIView):
             return Response({"error": "Validation failed", "details": serializer.errors})
     def get(self, request, id = None):
         if id is not None:
-            lead = Lead.objects.get(id=id) 
-            serializer = LeadSerializer(lead)
+            try:
+                # lead = Lead.objects.get(id = id)
+                lead = Lead.objects.get(Q(id=id) & Q(LeadRepresentativeSecondary=request.user))
+                serializer = LeadSerializer(lead)
+                return Response(serializer.data)
+            except ObjectDoesNotExist:  # Catch ObjectDoesNotExist exception
+                return Response({"Msg": "Not Found"}, status=status.HTTP_404_NOT_FOUND)
+
+
+
+            
+        else:    
+            if request.user.is_admin:
+                lead = Lead.objects.all()
+            else:
+                lead = Lead.objects.filter(LeadRepresentativePrimary=request.user)  
+
+            serializer = LeadSerializer(lead, many=True)
             return Response(serializer.data)
-        lead = Lead.objects.all() 
-        serializer = LeadSerializer(lead, many=True)
-        return Response(serializer.data)
     def put(self, request, id=None):
         if id is None:
             return Response({"Msg": "Id is None"}, status=status.HTTP_400_BAD_REQUEST)
@@ -64,7 +81,7 @@ class LeadAddView(APIView):
             lead_instance = Lead.objects.get(id=id)
         except Lead.DoesNotExist:
             return Response({"Msg": "Lead not found"}, status=status.HTTP_404_NOT_FOUND)
-
+        print("This put request is running")
         serializer = LeadSerializer(lead_instance, data=request.data, partial=True)
         if serializer.is_valid():
             serializer.save()

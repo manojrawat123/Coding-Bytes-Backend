@@ -4,6 +4,7 @@ from rest_framework import status
 from rest_framework.generics import RetrieveAPIView
 from customerstudent.models import Customer
 from customerstudent.serializers import CustomerSerializer
+from django.db.models import Q
 
 class CustomerList(APIView):
     def get(self, request):

@@ -5,19 +5,24 @@ from rest_framework.generics import RetrieveAPIView
 from convertedstudent.models import convertedstudent
 from convertedstudent.serializers import ConvertedStudentSerializer
 from django.shortcuts import get_object_or_404
+from django.db.models import Q
 
 class ConvertedStudentList(APIView):
     def get(self, request, id=None):
         if id is not None:
-            customer = convertedstudent.objects.filter(ConvertedID=id)
+            if request.user.is_admin:
+                customer = convertedstudent.objects.filter(ConvertedID=id)
+            else:
+                customer = convertedstudent.objects.filter(Q(ConvertedId = id) & Q(Representative = request.user ))
             serializer = ConvertedStudentSerializer(customer, many=True)
             return Response(serializer.data)
         else:
-            customers = convertedstudent.objects.all()
+            if request.user.is_superuser:
+                customers = convertedstudent.objects.all()
+            else:
+                customers = convertedstudent.objects.filter(Representative=request.user)
             serializer = ConvertedStudentSerializer(customers, many=True)
             return Response(serializer.data)
-
-
 
     def post(self, request):
         serializer = ConvertedStudentSerializer(data=request.data)

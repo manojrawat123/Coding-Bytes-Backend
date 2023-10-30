@@ -2,6 +2,8 @@ from django.db import models
 from brand.models import Brand
 from company.models import Company
 from service.models import Service
+from leadScource.models import LeadSource
+from myuser.models import MyUser
 
 # Create your models here.
 class Lead(models.Model):
@@ -10,7 +12,7 @@ class Lead(models.Model):
     LeadEmail = models.EmailField()
     LeadLocation = models.CharField(max_length=100)
     LeadAddress = models.CharField(max_length=200)
-    # LeadScourceId = models.ForeignKey()
+    LeadScourceId = models.ForeignKey(LeadSource, on_delete=models.CASCADE)
     LeadSource = models.CharField(max_length=100)
     LeadServiceInterested = models.ManyToManyField(Service)
     Brand = models.ForeignKey(Brand, on_delete=models.CASCADE)
@@ -36,11 +38,9 @@ class Lead(models.Model):
             ("Other", "Other"), 
         ])
     DND = models.BooleanField(default=False)
-    LeadRepresentativePrimary = models.CharField(max_length=100)
-    LeadRepresentativeSecondary = models.CharField(max_length=100)
+    LeadRepresentativePrimary = models.ForeignKey(MyUser, on_delete=models.CASCADE, related_name='LeadRepresentativePrimary')
+    LeadRepresentativeSecondary = models.ForeignKey(MyUser, on_delete=models.CASCADE, related_name='LeadRepresentativeSecondary')
     LeadCountry = models.CharField(max_length=100)
     LeadState = models.CharField(max_length=100)
     LeadAssignmentAlgo = models.CharField(max_length=100)
     LeadNextCallDate = models.DateField()
-    CourseName = models.CharField(max_length=300)
-    # Add other fields for Lead model as needed

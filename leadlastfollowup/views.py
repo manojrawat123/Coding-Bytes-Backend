@@ -9,6 +9,7 @@ from lead.models import Lead
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from convertedstudent.models import convertedstudent
+from rest_framework import status
 
 
 class LeadLastFollowupListCreateView(generics.ListCreateAPIView):
@@ -16,18 +17,6 @@ class LeadLastFollowupListCreateView(generics.ListCreateAPIView):
     queryset = LeadLastFollowUp.objects.all()
     serializer_class = LeadLastFollowUpSerializer
      
-    # def post(self, request, *args, **kwargs):
-    #     serializer = self.serializer_class(data=request.POST)
-    #     serializer.is_valid(raise_exception=True)
-    #     lead_last_followup = serializer.save()
-
-    # # Update the foreign key with the new value from the POST request
-    #     if lead_last_followup.LeadID is not None:
-    #         lead = Lead.objects.get(pk=lead_last_followup.LeadID)
-    #         lead.LeadID = serializer.validated_data['LeadID']
-    #         lead.save()
-
-    #     return JsonResponse({'success': True})
 
 class LeadLastFollowUpByLeadId(APIView):
     def get(self, request, id=None):
@@ -39,58 +28,45 @@ class LeadLastFollowUpByLeadId(APIView):
             fee = LeadLastFollowUp.objects.all()
             serializer = LeadLastFollowUpSerializer(fee, many=True)
             return Response(serializer.data)
+        
+    def post(self, request, id = None):
+        if id is None:
+            print("-----id is none ------")
+            return Response({"error": "Method Not Allowed!!"}, status=status.HTTP_400_BAD_REQUEST)
 
-class LeadLastFollowupDetailView(generics.RetrieveUpdateDestroyAPIView):
+        else:
+            customer = LeadLastFollowUp.objects.get(LeadID =id)
+            print("----customer-----")
+            print(customer)
+            if customer is not None:
+                print("Customer Exists:")
+                customer.delete()
+                serializer = LeadLastFollowUpSerializer(data=request.data)
+                if serializer.is_valid():
+                    serializer.save()
+                    return Response({"Msg": "Updated Sucessfully!!"})
+                else:
+                    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+            else:
+                serializer = LeadLastFollowUpSerializer(data=request.data)
+                if serializer.is_valid():
+                    serializer.save()
+                    return Response({"Msg": "Updated Sucessfully!!"})
+                else:
+                    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)         
 
-    renderer_classes = [UserRenderer]
-    permission_classes = [IsAuthenticated]
-    queryset = LeadLastFollowUp.objects.all()
-    serializer_class = LeadLastFollowUpSerializer
-    def put(self, request, *args, **kwargs):
-        pk = self.kwargs['pk']
-        lead_last_followup = LeadLastFollowUp.objects.get(pk=pk)
-        serializer = self.serializer_class(lead_last_followup, data=request.POST)
-        serializer.is_valid(raise_exception=True)
-        serializer.save()
-    # Update the foreign key with the new value from the POST request
-        if serializer.validated_data['LeadID'] is not None:
-            lead_last_followup.LeadID = serializer.validated_data['LeadID']
-            lead_last_followup.save()
 
-        return JsonResponse({'success': True})
 
 class LeadLastFollowUpNotConverted(APIView):
-    # def get(self, request):
-    #     followups_not_converted = LeadLastFollowUp.objects.exclude(LeadID__in=convertedstudent.objects.values('LeadID'))
-    #     serializer = LeadLastFollowUpSerializer(followups_not_converted, many=True)
-    #     return Response(serializer.data)
 
     def get(self, request):
-        # Define the custom sorting order
         status_order = {
-            'Fresh': 1,
-            'Ready To Enroll': 2,
-            'Visit scheduled': 3,
-            'Demo scheduled': 4,
-            "Highly Intersted": 5,
-            "Least Intersted": 6,
-            "Distance Issue": 7,
-            "Pricing Issue": 8,
-            "Already Taken Service": 9,
-            "Quality Issue": 10,
-            "Not Interested Anymore": 11,
-            "Did Not Enquire": 12,
-            "Only Wanted Information": 13,
-            "Other": 14,
+            'Fresh': 1,'Ready To Enroll': 2,'Visit scheduled': 3,'Demo scheduled': 4,"Highly Intersted": 5,"Least Intersted": 6,"Distance Issue": 7,"Pricing Issue": 8,"Already Taken Service": 9,"Quality Issue": 10,"Not Interested Anymore": 11,"Did Not Enquire": 12,"Only Wanted Information": 13,"Other": 14,
         }
-
-        # Get the queryset of followups not converted
         followups_not_converted = LeadLastFollowUp.objects.exclude(LeadID__in=convertedstudent.objects.values('LeadID'))
 
-        # Sort the queryset based on the custom order
         sorted_followups = sorted(followups_not_converted, key=lambda x: status_order.get(x.LeadStatus, float('inf')))
 
-        # Serialize the sorted data
         serializer = LeadLastFollowUpSerializer(sorted_followups, many=True)
 
         return Response(serializer.data)

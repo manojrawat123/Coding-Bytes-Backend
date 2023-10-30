@@ -8,7 +8,9 @@ import datetime
 from django.conf import settings
 from django.core.mail import send_mail ,EmailMessage 
 from django.conf import settings
-from twilio.rest import Client 
+from twilio.rest import Client   
+
+
     
 class MessageLogSheduleOnlyEmail(APIView):
     permission_classes = [IsAuthenticated]
@@ -20,17 +22,26 @@ class MessageLogSheduleOnlyEmail(APIView):
                 phone_list = serializers.validated_data.get("phone")
                 message_body = serializers.validated_data.get("body")
                 from_phone = settings.TWILIO_PHONE_NUMBER 
+                print({
+                    "phone_list": phone_list,
+                    "message_body": message_body,
+                    "from_phone": from_phone
+                })
                 for recipient_number in phone_list:
                     # Send an SMS to each recipient
-                    message = client.messages.create(
-                        body=message_body,
-                        from_=from_phone,
-                        to= "+"+f"{recipient_number}"
-                    )
+                    try:
+
+                        message = client.messages.create(
+                            body=message_body,
+                            from_=from_phone,
+                            to= recipient_number
+                        )
+                        print("message Send Sucessfully!!")
+                    except Exception as e1:
+                        print(f"Ivalid Phone Number:")
                 return Response({"Msg": "Message Send Successfully!!"})
             except Exception as e:
                 print(f"SMS sending failed: {e}")
-                return Response({"msg": "SMS Failed"})
         return Response(serializers.errors, status=400)
     
 

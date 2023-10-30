@@ -5,6 +5,8 @@ from rest_framework.generics import RetrieveAPIView
 from feetracer.models import Fee
 from feetracer.serializers import FeesSerializerGet, FeesSerializerPost
 from rest_framework import generics
+from django.db.models import Q
+
 
 
 class FeeTrackerList(APIView):
@@ -14,7 +16,7 @@ class FeeTrackerList(APIView):
             serializer = FeesSerializerGet(customer, many=True)
             return Response(serializer.data)
         else:
-            fee = Fee.objects.all()
+            fee = Fee.objects.filter(representative=request.user)
             serializer = FeesSerializerGet(fee, many=True)
             return Response(serializer.data)
  

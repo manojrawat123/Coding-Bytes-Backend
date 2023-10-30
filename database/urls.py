@@ -23,11 +23,10 @@ from leadfollowup.views import LeadFollowupListCreateView, LeadFollowupDetailVie
 from payment.views import PaymentList, PaymentDetail,PaymentByLead
 from paymentmode.views import MyPaymentMode
 from paymenttype.views import MyPaymentType
-from leadlastfollowup.views import LeadLastFollowupListCreateView,LeadLastFollowupDetailView
+from leadlastfollowup.views import LeadLastFollowupListCreateView,LeadLastFollowUpByLeadId, LeadLastFollowUpNotConverted
 from customerstudent.views import CustomerList
 from convertedstudent.views import ConvertedStudentList
 from feetracer.views import FeeTrackerList,FeeTracerByPaymentID,FeeTrackekrkDetail
-from leadlastfollowup.views import LeadLastFollowUpByLeadId, LeadLastFollowUpNotConverted
 from navbar.views import MyNavbar
 from django.conf.urls.static import static
 from django.conf import settings
@@ -59,7 +58,7 @@ urlpatterns = [
     path('leadnotconverted/', LeadLastFollowUpNotConverted.as_view(), name='leadfollowup-not-converted-list'),
     path('leadfollowup/<int:id>/', LeadFollowupListCreateView.as_view(), name='leadfollowup-detail'),
     path('leadlastfollowup/', LeadLastFollowupListCreateView.as_view(), name='leadlastfollowup-list'),
-    path('leadlastfollowup/<int:pk>/', LeadLastFollowupListCreateView.as_view(), name='leadlastfollowup-detail'),
+    # path('leadlastfollowup/<int:pk>/', LeadLastFollowUpByLeadId.as_view(), name='leadlastfollowup-detail'),
     path('leadlastfollowupbyid/<int:id>/',LeadLastFollowUpByLeadId.as_view(), name="LeadLastFollowUpById"),
     path('payments/', PaymentList.as_view(), name='payment-list'),
     path('payments/<int:id>/', PaymentList.as_view(), name='payment-detail'),
