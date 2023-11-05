@@ -92,5 +92,22 @@ class MyProfile(APIView):
     def get(self, request, format=None):
         serializer = UserProfileSerializer(request.user)
         return Response(serializer.data, status=status.HTTP_200_OK)   
+
+
+class GetNameById(APIView):
+    
+    renderer_classes = [UserRenderer]
+    permission_classes = [IsAuthenticated]
+    def get(self, request, id=None):
+        if id is None:
+            return Response({"error": "Method Not Allowed"}, status=status.HTTP_400_BAD_REQUEST)
+        
+        
+        userData =MyUser.objects.get(id=id)
+        
+        serializer = MyUserRegisterSerializer(userData)
+        return Response(serializer.data)
+
+        
     
 

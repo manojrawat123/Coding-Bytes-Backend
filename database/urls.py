@@ -15,10 +15,10 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path
-from myuser.views import UserRegistrationView, MyLogin, MyProfile, UserRegisterViewByID
+from myuser.views import UserRegistrationView, MyLogin, MyProfile, UserRegisterViewByID, GetNameById
 from lead.views import LeadAddView, LeadDetailView
 from django.urls import path
-from service.views import ServiceListView
+from service.views import ServiceListView, ServiceListById
 from leadfollowup.views import LeadFollowupListCreateView, LeadFollowupDetailView
 from payment.views import PaymentList, PaymentDetail,PaymentByLead
 from paymentmode.views import MyPaymentMode
@@ -47,6 +47,7 @@ urlpatterns = [
     path("register/<int:id>/", UserRegisterViewByID.as_view(), name="register_by_id"),
     path("login/", MyLogin.as_view(), name="login"),
     path('profile/', MyProfile.as_view(), name='profile'),
+    path('user/<int:id>/', GetNameById.as_view(), name='user'),
     path('lead/', LeadAddView.as_view(), name='addlead'),
     path('lead/<int:id>/', LeadAddView.as_view(), name='update-lead'),
     path('brand/<int:id>/', BrandApiViewById.as_view(), name='brand'),
@@ -54,11 +55,12 @@ urlpatterns = [
     path('leadscource/', LeadScourceApiView.as_view(), name='lead-scource-view'),
     path('leadscource/<int:id>/', LeadScourceApiById.as_view(), name='lead-scource-view-by-id'),
     path('services/<int:brand_id>/', ServiceListView.as_view(), name='service-list'),
+    path('servicesbyid/<int:id>/', ServiceListById.as_view(), name='service-obj-by-id'),
     path('leadfollowup/', LeadFollowupListCreateView.as_view(), name='leadfollowup-list'),
     path('leadnotconverted/', LeadLastFollowUpNotConverted.as_view(), name='leadfollowup-not-converted-list'),
     path('leadfollowup/<int:id>/', LeadFollowupListCreateView.as_view(), name='leadfollowup-detail'),
     path('leadlastfollowup/', LeadLastFollowupListCreateView.as_view(), name='leadlastfollowup-list'),
-    # path('leadlastfollowup/<int:pk>/', LeadLastFollowUpByLeadId.as_view(), name='leadlastfollowup-detail'),
+    path('leadlastfollowup/<int:pk>/', LeadLastFollowUpByLeadId.as_view(), name='leadlastfollowup-detail'),
     path('leadlastfollowupbyid/<int:id>/',LeadLastFollowUpByLeadId.as_view(), name="LeadLastFollowUpById"),
     path('payments/', PaymentList.as_view(), name='payment-list'),
     path('payments/<int:id>/', PaymentList.as_view(), name='payment-detail'),

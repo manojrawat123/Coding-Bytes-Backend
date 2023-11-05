@@ -55,6 +55,6 @@ class LeadLastFollowUp(models.Model):
     LeadEventTakenBy = models.CharField(max_length=100,null=True, blank=True)
     LeadFeeOffered = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
     LeadReasonPhoneNotPicked = models.TextField(null=True, blank=True)
-    LeadServiceInterested = models.ManyToManyField(Service)
+    LeadServiceInterested = models.ForeignKey(Service, on_delete=models.CASCADE)
 
    

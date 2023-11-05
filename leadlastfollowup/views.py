@@ -30,30 +30,30 @@ class LeadLastFollowUpByLeadId(APIView):
             return Response(serializer.data)
         
     def post(self, request, id = None):
+        print("post Request----")
         if id is None:
             print("-----id is none ------")
             return Response({"error": "Method Not Allowed!!"}, status=status.HTTP_400_BAD_REQUEST)
 
+        try:
+            customer = LeadLastFollowUp.objects.get(LeadID=id)
+            print("Customer Exists:")
+            # Delete the existing customer object
+            customer.delete()
+            
+            # Create a new customer object with the new data
+            serializer = LeadLastFollowUpSerializer(data=request.data)
+        except LeadLastFollowUp.DoesNotExist:
+            print("Customer Did Not Exist")
+            # The customer with the specified LeadID doesn't exist, create a new one
+            serializer = LeadLastFollowUpSerializer(data=request.data)
+
+        if serializer.is_valid():
+            print("---data saved !!---")
+            serializer.save()
+            return Response({"Msg": "Updated Successfully!!"})
         else:
-            customer = LeadLastFollowUp.objects.get(LeadID =id)
-            print("----customer-----")
-            print(customer)
-            if customer is not None:
-                print("Customer Exists:")
-                customer.delete()
-                serializer = LeadLastFollowUpSerializer(data=request.data)
-                if serializer.is_valid():
-                    serializer.save()
-                    return Response({"Msg": "Updated Sucessfully!!"})
-                else:
-                    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-            else:
-                serializer = LeadLastFollowUpSerializer(data=request.data)
-                if serializer.is_valid():
-                    serializer.save()
-                    return Response({"Msg": "Updated Sucessfully!!"})
-                else:
-                    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)         
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST) 
 
 
 
