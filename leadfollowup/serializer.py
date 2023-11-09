@@ -1,5 +1,7 @@
 from rest_framework import serializers
 from leadfollowup.models import LeadFollowUp
+from service.serializers import ServiceSerializer
+from myuser.serializers import UserNameSerializer
 
 class LeadFollowupSerializer(serializers.ModelSerializer):
     class Meta:
@@ -22,7 +24,7 @@ class LeadFollowupSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError("Only one of LeadPhonePicked or LeadEvent should be provided.")
         elif lead_phone_picked == "Yes" and lead_status is None:
             raise serializers.ValidationError("Please Select Lead Status")
-        elif lead_status is not None and lead_status not in [ "Distance Issue","Pricing Issue",  "Already Taken Service", "Quality Issue", "Not Interested Anymore", "Did Not Enquire", "Only Wanted Information", "Other"] and lead_status_date is None:
+        elif lead_status is not None and lead_status not in [ "Distance Issue","Pricing Issue",  "Already Taken Service", "Quality Issue", "Not Interested Anymore", "Did Not Enquire", "Only Wanted Information", "Other", "Try Next Time"] and lead_status_date is None:
             raise serializers.ValidationError("Lead status date is required.")
         elif lead_event is not None and lead_event_date is None:
             raise serializers.ValidationError("Lead Event date Cannot be None")
@@ -31,3 +33,28 @@ class LeadFollowupSerializer(serializers.ModelSerializer):
         # Perform other validations or processing here if needed
         # ...
         return data
+    
+
+class LeadGetFollowUpSerializer(serializers.ModelSerializer):
+    LeadServiceInterested = ServiceSerializer()
+    LeadRep = UserNameSerializer()
+    class Meta:
+        model = LeadFollowUp
+        fields = [
+            "LeadFollowupID",
+            "LeadID",
+            "Company",
+            "Brand",
+            "LeadFollowupCreatedDate",
+            "LeadPhonePicked",
+            "LeadStatus",
+            "LeadStatusDate",
+            "LeadEvent",
+            "LeadEventDate",
+            "LeadRep",
+            "LeadEventTakenBy",
+            "LeadFeeOffered",
+            "LeadReasonPhoneNotPicked",
+            "LeadServiceInterested"
+        ]
+

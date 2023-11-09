@@ -59,10 +59,6 @@ class UserRegisterViewByID(APIView):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
-
-
-
-    
     
 class MyLogin(APIView):
     renderer_classes = [UserRenderer]
@@ -87,8 +83,6 @@ class MyLogin(APIView):
 class MyProfile(APIView):
     renderer_classes = [UserRenderer]
     permission_classes = [IsAuthenticated]
-    
-    
     def get(self, request, format=None):
         serializer = UserProfileSerializer(request.user)
         return Response(serializer.data, status=status.HTTP_200_OK)   

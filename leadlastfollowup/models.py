@@ -37,6 +37,7 @@ class LeadLastFollowUp(models.Model):
             ("Did Not Enquire", "Did Not Enquire"),  
             ("Only Wanted Information", "Only Wanted Information"), 
             ("Other", "Other"),
+            ("Try Next Time", "Try Next Time"), 
         ],
         null=True
     )

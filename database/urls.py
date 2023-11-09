@@ -16,9 +16,9 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path
 from myuser.views import UserRegistrationView, MyLogin, MyProfile, UserRegisterViewByID, GetNameById
-from lead.views import LeadAddView, LeadDetailView
+from lead.views import LeadAddView, LeadDetailView,LeadFilterView
 from django.urls import path
-from service.views import ServiceListView, ServiceListById
+from service.views import ServiceListView, ServiceListById,GetServiceDetailsArrByID
 from leadfollowup.views import LeadFollowupListCreateView, LeadFollowupDetailView
 from payment.views import PaymentList, PaymentDetail,PaymentByLead
 from paymentmode.views import MyPaymentMode
@@ -51,10 +51,12 @@ urlpatterns = [
     path('lead/', LeadAddView.as_view(), name='addlead'),
     path('lead/<int:id>/', LeadAddView.as_view(), name='update-lead'),
     path('brand/<int:id>/', BrandApiViewById.as_view(), name='brand'),
-    path('lead/<int:pk>/', LeadDetailView.as_view(), name='lead-detail'),
+    # path('lead/<int:pk>/', LeadDetailView.as_view(), name='lead-detail'),
+    path('leadfilter/', LeadFilterView.as_view(), name='lead-filter-view'),
     path('leadscource/', LeadScourceApiView.as_view(), name='lead-scource-view'),
     path('leadscource/<int:id>/', LeadScourceApiById.as_view(), name='lead-scource-view-by-id'),
     path('services/<int:brand_id>/', ServiceListView.as_view(), name='service-list'),
+    path('servicesarrbyId/', GetServiceDetailsArrByID.as_view(), name='selected-service-list'),
     path('servicesbyid/<int:id>/', ServiceListById.as_view(), name='service-obj-by-id'),
     path('leadfollowup/', LeadFollowupListCreateView.as_view(), name='leadfollowup-list'),
     path('leadnotconverted/', LeadLastFollowUpNotConverted.as_view(), name='leadfollowup-not-converted-list'),

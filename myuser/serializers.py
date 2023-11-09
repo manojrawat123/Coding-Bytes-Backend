@@ -26,14 +26,12 @@ class MyUserSerializers(serializers.ModelSerializer):
 class MyUserRegisterSerializer(serializers.ModelSerializer):
     class Meta:
         model = MyUser
-        fields = "__all__"  # Include all fields from the MyUser model
+        fields = "__all__" 
 
-    # def validate(self, attrs):
-    #     password = attrs.get("password")
-    #     password2 = attrs.get("password2")
-    #     if password != password2:
-    #         raise serializers.ValidationError("Password didn't match")
-    #     return attrs
+class UserNameSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = MyUser
+        fields = ["id", "name"]
     
 
     

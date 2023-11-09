@@ -11,7 +11,7 @@ class BrandApiViewById(APIView):
     permission_classes = [IsAuthenticated]
     def get(self, request, id=None):
         if id is not None:
-            brand = Brand.objects.get( id=id)
+            brand = Brand.objects.get(id=id)
             serializers = BrandSerializers(brand)
             return Response(serializers.data,status= status.HTTP_200_OK) 
         return Response(serializers.data, status=status.HTTP_400_BAD_REQUEST)

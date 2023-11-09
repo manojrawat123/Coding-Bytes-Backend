@@ -10,6 +10,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from convertedstudent.models import convertedstudent
 from rest_framework import status
+from django.db.models import Q
 
 
 class LeadLastFollowupListCreateView(generics.ListCreateAPIView):
@@ -35,8 +36,10 @@ class LeadLastFollowUpByLeadId(APIView):
             return Response({"error": "Method Not Allowed!!"}, status=status.HTTP_400_BAD_REQUEST)
 
         try:
-            customer = LeadLastFollowUp.objects.get(LeadID=id)
-            # Delete the existing customer object
+            serviceId = request.data.get('LeadServiceInterested')
+            customer = LeadLastFollowUp.objects.get(Q(LeadID=id) & Q(LeadServiceInterested=serviceId))
+            print(customer)
+            # # Delete the existing customer object
             customer.delete()
             
             # Create a new customer object with the new data

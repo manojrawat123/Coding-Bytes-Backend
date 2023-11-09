@@ -35,7 +35,8 @@ class LeadFollowUp(models.Model):
             ("Not Interested Anymore", "Not Interested Anymore"),  
             ("Did Not Enquire", "Did Not Enquire"),  
             ("Only Wanted Information", "Only Wanted Information"),  
-            ("Other", "Other"), 
+            ("Other", "Other"),             
+            ("Try Next Time", "Try Next Time"), 
         ],
         null=True
     )
