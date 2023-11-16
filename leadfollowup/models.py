@@ -4,6 +4,7 @@ from brand.models import Brand
 from myuser.models import MyUser
 from lead.models import Lead
 from service.models import Service
+from django.utils import timezone
 
 # Create your models here.
 class LeadFollowUp(models.Model):
@@ -40,7 +41,7 @@ class LeadFollowUp(models.Model):
         ],
         null=True
     )
-    LeadStatusDate = models.DateTimeField(null=True, blank=True)
+    LeadStatusDate = models.DateTimeField(default=timezone.now, blank=True)
     LeadEvent = models.CharField(
         max_length=20,
         choices=[

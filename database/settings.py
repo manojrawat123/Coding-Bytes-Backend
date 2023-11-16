@@ -70,7 +70,8 @@ INSTALLED_APPS = [
     'emailtemplate',
     'messagelog',
     'messageshedule',
-    'messagetemplate'
+    'messagetemplate',
+    'usercourse'
 ]
 
 MIDDLEWARE = [

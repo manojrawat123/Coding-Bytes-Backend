@@ -18,6 +18,9 @@ from rest_framework import generics, filters
 from django_filters.rest_framework import DjangoFilterBackend
 from leadfollowup.serializer import LeadFollowupSerializer
 from leadlastfollowup.serializer import LeadLastFollowUpSerializer
+from myuser.models import MyUser
+from django.db.models import Min
+from usercourse.models import UserCourse
 
 # Create your views here.
 class LeadAddView(APIView):
@@ -25,18 +28,66 @@ class LeadAddView(APIView):
     permission_classes = [IsAuthenticated]
     def post(self, request, format=None):
         leadserializer = LeadSerializer(data=request.data)
+        userID = request.data.get("LeadRepresentativePrimary")
+        brandId = request.data.get("Brand")
+        courseId = request.data.get("LeadServiceInterested")
+        companyID = request.data.get("Company")
+        if userID is None:
+            # First Filter LIst of the course Assign to user
+            courseAssign = list(UserCourse.objects.filter(Q(CourseID = courseId[0]) & Q(BrandID = brandId) & Q(CompanyID=companyID )).values_list("UserID", flat=True))
+            print(courseId , brandId, companyID)
+            print(courseAssign)
+
+            # Second Filter List Of Active User
+            myuser = list(MyUser.objects.filter(Q(brand = brandId) & Q (is_active = True)).values_list("id", flat=True))
+            courseAssignActive = [x for x in myuser if x in courseAssign]
+            print(courseAssignActive)
+            if (len(courseAssignActive) == 0):
+                print("No Active User Allocated For this Brand")
+                return Response({"Error": "No Brand Allocated"}, status= status.HTTP_400_BAD_REQUEST)
+            elif (len(courseAssignActive) ==1):
+                request.data["LeadRepresentativePrimary"] = courseAssignActive[0]
+                request.data["LeadRepresentativeSecondary"] = courseAssignActive[0]
+                userID = courseAssignActive[0]
+            # Thirld Filter List of smallest Lead Add
+            elif(len(courseAssignActive )> 1):
+                smallest_weightage = UserCourse.objects.aggregate(Min('CourseWeightage'))['CourseWeightage__min']
+                user_courses_with_smallest_weightage = list(UserCourse.objects.filter(CourseWeightage=smallest_weightage).values_list("UserID", flat=True))
+                courseAssignActiveSmallest = [x for x in courseAssignActive if x in user_courses_with_smallest_weightage]
+
+                # Fourth Filter Last Lead
+                if (len(courseAssignActiveSmallest) == 1):
+                    request.data["LeadRepresentativePrimary"] = courseAssignActiveSmallest[0]
+                    
+                    request.data["LeadRepresentativeSecondary"] = courseAssignActive[0]
+                    userID = courseAssignActiveSmallest[0]
+                    print(request.data)
+
+                elif (len(courseAssignActiveSmallest ) > 1):
+                    last_lead_user = Lead.objects.all().latest("id").LeadRepresentativePrimary.id
+                    courseAssignActSmNotLastLead = [x for x in courseAssignActiveSmallest if x  != last_lead_user]
+                    userID = courseAssignActSmNotLastLead[0]
+                    request.data["LeadRepresentativePrimary"] =courseAssignActSmNotLastLead[0]
+                    request.data["LeadRepresentativeSecondary"] = courseAssignActive[0]
+                    
+            userPriority = UserCourse.objects.get(Q(UserID = userID)& Q(CourseID =courseId[0]))
+            userPriority.CourseWeightage = userPriority.CourseWeightage + 1
+            userPriority.save()
+            print(userPriority)
+
+
         if leadserializer.is_valid(raise_exception=True):
             leadserializer.save()
             # LeadFollowUp Serializer
             serviceIntrested = request.data.get("LeadServiceInterested")
-
+            
             try:
                 for i in serviceIntrested:
                     myData = {
                         'LeadID': leadserializer.data.get('id'),
                             'Company': request.data.get("Company"),
                             'Brand': request.data.get("Brand"),
-                            'LeadRep': request.data.get("LeadRepresentativePrimary"),
+                            'LeadRep': userID,
                             'LeadStatus': request.data.get("LeadStatus"),
                             'LeadStatusDate': request.data.get("LeadDateTime"),
                             'LeadServiceInterested': i    
@@ -62,6 +113,8 @@ class LeadAddView(APIView):
         else:
             # Handle validation errors if the serializer is not valid
             return Response({"error": "Validation failed", "details": leadserializer.errors})
+        
+   
     def get(self, request, id = None):
         if id is not None:
             try:

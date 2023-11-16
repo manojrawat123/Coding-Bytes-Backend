@@ -6,7 +6,7 @@ from feetracer.models import Fee
 from feetracer.serializers import FeesSerializerGet, FeesSerializerPost
 from rest_framework import generics
 from django.db.models import Q
-
+ 
 
 
 class FeeTrackerList(APIView):

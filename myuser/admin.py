@@ -4,10 +4,10 @@ from myuser.models import MyUser
 
 # Register your models here.
 class UserAdmin(BaseUserAdmin):
-    list_display = ["email", "name", "phone", "is_admin",  "company"]
+    list_display = ["email", "name", "phone", "is_admin",  "company", "is_active"]
     list_filter = ["is_admin"]
     fieldsets = [
-        (None, {"fields": ["email", "password", "company", "brand"]}),
+        (None, {"fields": ["email", "password", "company", "brand","is_active"]}),
         ("Personal info", {"fields": ["name", "phone"]}),
         ("Permissions", {"fields": ["is_admin"]}),
         ("Additional Info", {"fields": ["status", "online_status", "designation", "user_location", "last_login", ]}),

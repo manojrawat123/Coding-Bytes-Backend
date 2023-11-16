@@ -2,6 +2,7 @@ from rest_framework import serializers
 from leadfollowup.models import LeadFollowUp
 from service.serializers import ServiceSerializer
 from myuser.serializers import UserNameSerializer
+from lead.serializer import LeadGetSerializer
 
 class LeadFollowupSerializer(serializers.ModelSerializer):
     class Meta:
@@ -38,6 +39,7 @@ class LeadFollowupSerializer(serializers.ModelSerializer):
 class LeadGetFollowUpSerializer(serializers.ModelSerializer):
     LeadServiceInterested = ServiceSerializer()
     LeadRep = UserNameSerializer()
+    LeadID = LeadGetSerializer()
     class Meta:
         model = LeadFollowUp
         fields = [

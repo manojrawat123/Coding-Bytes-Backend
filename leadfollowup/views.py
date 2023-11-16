@@ -38,29 +38,36 @@ class LeadFollowupListCreateView(APIView):
             print(leadId)
             print(serviceId)
             leadStatus = request.data.get("LeadStatus")
-            leadLastFollowUpData = LeadLastFollowUp.objects.get(LeadID=leadId, LeadServiceInterested=serviceId)
-
-            
-            
             leadData = Lead.objects.get(id = leadId)
             if leadData is None:
                 return Response({"error": "Lead Id not exists"}, status=status.HTTP_400_BAD_REQUEST)
             leadSerializer = LeadSerializer(leadData, data={"LeadStatus": leadStatus}, partial=True)
-            if leadLastFollowUpData is not None:
-                leadLastFollowUpData.delete()
             
-            if leadFollowUpserializer.is_valid() and leadLastFollowUpserializer.is_valid() and leadSerializer.is_valid():
-                leadSerializer.save()
+            try:
+                leadLastFollowUpData = LeadLastFollowUp.objects.get(Q(LeadID=leadId) &  Q(LeadServiceInterested=serviceId))
+                if leadLastFollowUpData is not None:
+                    leadLastFollowUpData.delete()
+            
+            except:
+                print("Data Not Found")
+                return Response({"error": "Service Not match"}, status=status.HTTP_400_BAD_REQUEST)
+
+            
+            
+            
+            if leadFollowUpserializer.is_valid():
                 leadLastFollowUpserializer.save()
-                leadFollowUpserializer.save()
-                return Response(leadFollowUpserializer.data, status=status.HTTP_201_CREATED)
             else:
-                combined_errors = {
-                    "leadFollowUp": leadFollowUpserializer.errors,
-                    "leadLastFollowUp": leadLastFollowUpserializer.errors,
-                    "lead": leadSerializer.errors,
-                }
-                return Response(combined_errors, status=status.HTTP_400_BAD_REQUEST)
+                return Response(leadFollowUpserializer.errors,status=status.HTTP_400_BAD_REQUEST)
+            if leadLastFollowUpserializer.is_valid():
+                leadFollowUpserializer.save()
+            else:
+                return Response(leadLastFollowUpserializer.errors,status=status.HTTP_400_BAD_REQUEST)
+            if leadSerializer.is_valid():
+                leadSerializer.save()
+                return Response({"Sucess": "Data Submitted Sucessfully"}, status=status.HTTP_201_CREATED)
+            else:
+                return Response(leadSerializer.errors, status=status.HTTP_400_BAD_REQUEST)
                 
         except Exception as e:
             print(f"ïnternal server error!! -- {e}")
