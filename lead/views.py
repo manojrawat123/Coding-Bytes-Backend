@@ -73,7 +73,6 @@ class LeadAddView(APIView):
             userPriority = UserCourse.objects.get(Q(UserID = userID)& Q(CourseID =courseId[0]))
             userPriority.CourseWeightage = userPriority.CourseWeightage + 1
             userPriority.save()
-            print(userPriority)
 
 
         if leadserializer.is_valid(raise_exception=True):

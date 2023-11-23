@@ -12,7 +12,7 @@ from django.db.models import Q
 class FeeTrackerList(APIView):
     def get(self, request, id=None):
         if id is not None:
-            customer = Fee.objects.filter(converted_id=id)
+            customer = Fee.objects.filter(Q(representative=request.user) & Q(converted_id=id))
             serializer = FeesSerializerGet(customer, many=True)
             return Response(serializer.data)
         else:
@@ -53,4 +53,6 @@ class FeeTracerByPaymentID(APIView):
 class FeeTrackekrkDetail(generics.ListCreateAPIView):
     queryset = Fee.objects.all()
     serializer_class = FeesSerializerPost
+
+
 

@@ -27,7 +27,6 @@ class Fee(models.Model):
     updated_by = models.CharField(max_length=100)
     payment_id = models.ForeignKey(Payment, on_delete=models.CASCADE)
     payment_type = models.ForeignKey(PaymentType, on_delete=models.CASCADE)
-
-
+    
     def __str__(self):
         return f"Fee - {self.id}"

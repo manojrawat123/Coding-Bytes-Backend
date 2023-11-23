@@ -73,6 +73,7 @@ class EmailSheduleOnlyEmail(APIView):
                 message = f'''{my_body}'''
                 email = EmailMessage(subject, message, email_from,recipient_list)
                 email.send()
+                
                 return Response({"Msg": "Email Send Successfully!!"})
             except Exception as e:
                 print(f"Email sending failed: {e}")

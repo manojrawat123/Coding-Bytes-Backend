@@ -5,7 +5,7 @@ from myuser.models import MyUser
 def generate_unique_url():
     while True:
         random_number = random.randint(1000, 9999)
-        url = f"http://localhost:5173/paymentredirectlink/{random_number}"
+        url = f"http://3.130.255.204:5173/paymentredirectlink/{random_number}"
         if not PaymentLink.objects.filter(PaymentLink=url).exists():
             return url
 

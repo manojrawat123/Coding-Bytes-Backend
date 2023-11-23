@@ -43,24 +43,21 @@ class LeadFollowupListCreateView(APIView):
                 return Response({"error": "Lead Id not exists"}, status=status.HTTP_400_BAD_REQUEST)
             leadSerializer = LeadSerializer(leadData, data={"LeadStatus": leadStatus}, partial=True)
             
-            try:
-                leadLastFollowUpData = LeadLastFollowUp.objects.get(Q(LeadID=leadId) &  Q(LeadServiceInterested=serviceId))
-                if leadLastFollowUpData is not None:
-                    leadLastFollowUpData.delete()
-            
-            except:
-                print("Data Not Found")
-                return Response({"error": "Service Not match"}, status=status.HTTP_400_BAD_REQUEST)
-
-            
-            
             
             if leadFollowUpserializer.is_valid():
-                leadLastFollowUpserializer.save()
+                leadFollowUpserializer.save()
             else:
                 return Response(leadFollowUpserializer.errors,status=status.HTTP_400_BAD_REQUEST)
             if leadLastFollowUpserializer.is_valid():
-                leadFollowUpserializer.save()
+                try:
+                    leadLastFollowUpData = LeadLastFollowUp.objects.get(Q(LeadID=leadId) &  Q(LeadServiceInterested=serviceId))
+                    if leadLastFollowUpData is not None:
+                        leadLastFollowUpserializer.save()
+                        leadLastFollowUpData.delete()
+                except:
+                    print("Data Not Found")
+                    return Response({"error": "Service Not match"}, status=status.HTTP_400_BAD_REQUEST)
+                
             else:
                 return Response(leadLastFollowUpserializer.errors,status=status.HTTP_400_BAD_REQUEST)
             if leadSerializer.is_valid():

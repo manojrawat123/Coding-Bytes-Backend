@@ -5,6 +5,7 @@ from myuser.models import MyUser
 from brand.models import Brand
 from company.models import Company
 from payment.models import Payment
+from service.models import Service
 
 class convertedstudent(models.Model): 
     ConvertedID = models.AutoField(primary_key=True)
@@ -16,6 +17,7 @@ class convertedstudent(models.Model):
             ("Offline", "Offline")
         ],
     )
+    CourseID = models.ForeignKey(Service, on_delete=models.CASCADE)
     CreatedDateTime = models.DateTimeField(auto_now_add=True)
     ConvertedDateTime = models.DateTimeField(auto_now_add=True)
     CourseStartDate = models.DateField() 

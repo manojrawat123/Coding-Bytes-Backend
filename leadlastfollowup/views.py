@@ -3,7 +3,7 @@ from myuser.renders import UserRenderer
 from rest_framework.permissions import IsAuthenticated
 from rest_framework import generics
 from leadlastfollowup.models import LeadLastFollowUp
-from leadlastfollowup.serializer import LeadLastFollowUpSerializer
+from leadlastfollowup.serializer import LeadLastFollowUpSerializer, LeadLastFollowupGetSerializer
 from django.http import JsonResponse
 from lead.models import Lead
 from rest_framework.response import Response
@@ -11,6 +11,7 @@ from rest_framework.views import APIView
 from convertedstudent.models import convertedstudent
 from rest_framework import status
 from django.db.models import Q
+
 
 
 class LeadLastFollowupListCreateView(generics.ListCreateAPIView):
@@ -23,31 +24,24 @@ class LeadLastFollowUpByLeadId(APIView):
     def get(self, request, id=None):
         if id is not None:
             customer = LeadLastFollowUp.objects.filter(LeadID=id)
-            serializer = LeadLastFollowUpSerializer(customer, many=True)
+            serializer = LeadLastFollowupGetSerializer(customer, many=True)
             return Response(serializer.data)
         else:
-            fee = LeadLastFollowUp.objects.all()
-            serializer = LeadLastFollowUpSerializer(fee, many=True)
+            lastfollowup = LeadLastFollowUp.objects.all()
+            serializer = LeadLastFollowupGetSerializer(lastfollowup, many=True)
             return Response(serializer.data)
         
     def post(self, request, id = None):
         if id is None:
-            
             return Response({"error": "Method Not Allowed!!"}, status=status.HTTP_400_BAD_REQUEST)
-
         try:
             serviceId = request.data.get('LeadServiceInterested')
             customer = LeadLastFollowUp.objects.get(Q(LeadID=id) & Q(LeadServiceInterested=serviceId))
             print(customer)
-            # # Delete the existing customer object
             customer.delete()
-            
-            # Create a new customer object with the new data
             serializer = LeadLastFollowUpSerializer(data=request.data)
         except LeadLastFollowUp.DoesNotExist:
-            # The customer with the specified LeadID doesn't exist, create a new one
             serializer = LeadLastFollowUpSerializer(data=request.data)
-
         if serializer.is_valid():
             serializer.save()
             return Response({"Msg": "Updated Successfully!!"})
@@ -66,6 +60,6 @@ class LeadLastFollowUpNotConverted(APIView):
 
         sorted_followups = sorted(followups_not_converted, key=lambda x: status_order.get(x.LeadStatus, float('inf')))
 
-        serializer = LeadLastFollowUpSerializer(sorted_followups, many=True)
+        serializer = LeadLastFollowupGetSerializer(sorted_followups, many=True)
 
         return Response(serializer.data)

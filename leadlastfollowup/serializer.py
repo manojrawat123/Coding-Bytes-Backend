@@ -1,5 +1,8 @@
 from rest_framework import serializers
 from .models import LeadLastFollowUp
+from service.serializers import ServiceSerializer
+from myuser.serializers import UserNameSerializer
+from lead.serializer import LeadGetSerializer
 
 class LeadLastFollowUpSerializer(serializers.ModelSerializer):
     class Meta:
@@ -28,3 +31,28 @@ class LeadLastFollowUpSerializer(serializers.ModelSerializer):
         # Perform other validations or processing here if needed
         # ...
         return data
+
+
+class LeadLastFollowupGetSerializer(serializers.ModelSerializer):
+    LeadServiceInterested = ServiceSerializer()
+    LeadRep = UserNameSerializer()
+    LeadID = LeadGetSerializer()
+    class Meta:
+        model = LeadLastFollowUp
+        fields = [
+            "LeadFollowupID",
+            "LeadID",
+            "Company",
+            "Brand",
+            "LeadFollowupCreatedDate",
+            "LeadPhonePicked",
+            "LeadStatus",
+            "LeadStatusDate",
+            "LeadEvent",
+            "LeadEventDate",
+            "LeadRep",
+            "LeadEventTakenBy",
+            "LeadFeeOffered",
+            "LeadReasonPhoneNotPicked",
+            "LeadServiceInterested"
+        ]

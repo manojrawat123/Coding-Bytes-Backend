@@ -12,12 +12,13 @@ from django.core.mail import send_mail ,EmailMessage
 class EmailLogSheduleOnlyEmail(APIView):
     permission_classes = [IsAuthenticated]
     def post(self, request, pk=None):
-        serializers = EmailLogSerializer(data=request.data)
+        serializers = EmailLogSaveSerializer(data=request.data)
         if serializers.is_valid():
-            try:
-                email_lis = serializers.data.get("emails")
-                my_subject = serializers.data.get("subject")
-                my_body = serializers.data.get("body")
+            try: 
+                print(request.data["emails"])
+                email_lis = request.data["emails"]
+                my_subject = request.data["subject"]
+                my_body = request.data["body"]
                 email_from = settings.EMAIL_HOST_USER
                 email = "positive.mind.123456789@gmail.com"
                 recipient_list = email_lis
@@ -25,10 +26,11 @@ class EmailLogSheduleOnlyEmail(APIView):
                 message = f'''{my_body}'''
                 email = EmailMessage(subject, message, email_from,recipient_list)
                 email.send() 
+                serializers.save()
                 return Response({"Msg": "Email Send Successfully!!"})
             except Exception as e:
                 print(f"Email sending failed: {e}")
-                return Response({"msg": "Email Failed"})
+                return Response({"msg": "Email Failed"}, status=status.HTTP_400_BAD_REQUEST)
         return Response(serializers.errors, status=400)
     
 class SaveEmailInLog(APIView):

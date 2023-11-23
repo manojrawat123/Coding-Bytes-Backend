@@ -25,7 +25,7 @@ from paymentmode.views import MyPaymentMode
 from paymenttype.views import MyPaymentType
 from leadlastfollowup.views import LeadLastFollowupListCreateView,LeadLastFollowUpByLeadId, LeadLastFollowUpNotConverted
 from customerstudent.views import CustomerList
-from convertedstudent.views import ConvertedStudentList
+from convertedstudent.views import ConvertedStudentList, ConvertedStudentListWithFeesDetails
 from feetracer.views import FeeTrackerList,FeeTracerByPaymentID,FeeTrackekrkDetail
 from navbar.views import MyNavbar
 from django.conf.urls.static import static
@@ -92,4 +92,6 @@ urlpatterns = [
     path('messagetemplate/',MessageTemplateView.as_view(),name="MessageTemplate"),
     path("messageshedule/", MessageLogSheduleOnlyEmail.as_view(), name="Message Shedule Only Email"),
     path("savemessage/", SaveMessageInLog.as_view(), name="Save Message In Log"),
+    path("convertedwithfeesdetails/", ConvertedStudentListWithFeesDetails.as_view(), name="Converted With Fees Details")
 ] + static(settings.MEDIA_URL, document_root= settings.MEDIA_ROOT)
+

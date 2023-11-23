@@ -2,6 +2,7 @@ from rest_framework import serializers
 from .models import Lead
 from service.serializers import ServiceSerializer
 from myuser.serializers import UserNameSerializer
+from leadScource.serializers import LeadScourceSerializers
 
 
 class LeadSerializer(serializers.ModelSerializer):
@@ -11,11 +12,10 @@ class LeadSerializer(serializers.ModelSerializer):
 
 
 class LeadGetSerializer(serializers.ModelSerializer):
-    LeadServiceInterested = ServiceSerializer(many=True)   
     LeadServiceInterested = ServiceSerializer(many=True)  
     LeadRepresentativePrimary = UserNameSerializer()
     LeadRepresentativeSecondary = UserNameSerializer()
-
+    LeadScourceId = LeadScourceSerializers()
     class Meta:
         model = Lead
         fields = ["id","LeadName","LeadPhone" ,"LeadEmail", "LeadLocation","LeadAddress", "LeadScourceId" ,"LeadSource", "Company" ,"Profession",
