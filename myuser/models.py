@@ -18,7 +18,6 @@ class MyUserManager(BaseUserManager):
             phone=phone,
             company= company,
         )
-
         user.set_password(password)
         user.save(using=self._db)
         user.brand.add(*brand_ids)

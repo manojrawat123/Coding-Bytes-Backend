@@ -46,9 +46,7 @@ class MyUserLoginSerializer(serializers.ModelSerializer):
             if value == "":
                 raise serializers.ValidationError(f"{field_name} field is required.")
         return data
-
-
-
+    
 
 class BrandSerializer(serializers.ModelSerializer):
     class Meta:
