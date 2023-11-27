@@ -41,7 +41,7 @@ class LeadFollowUp(models.Model):
         ],
         null=True
     )
-    LeadStatusDate = models.DateTimeField(default=timezone.now, blank=True)
+    LeadStatusDate = models.DateTimeField(default=timezone.now, blank=True,null=True)
     LeadEvent = models.CharField(
         max_length=20,
         choices=[
@@ -52,7 +52,7 @@ class LeadFollowUp(models.Model):
     )
     LeadEventDate = models.DateTimeField(null=True, blank=True)
     LeadRep = models.ForeignKey(MyUser, on_delete=models.CASCADE)
-    # LeadFollowupRep = models.ForeignKey(MyUser, on_delete=models.CASCADE)
+    LeadComments = models.TextField(null=True)
     LeadEventTakenBy = models.CharField(max_length=100)
     LeadFeeOffered = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
     LeadReasonPhoneNotPicked = models.TextField(null=True, blank=True)

@@ -31,8 +31,6 @@ class LeadFollowupSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError("Lead Event date Cannot be None")
         elif lead_event is not None and lead_event_taken_by is None:
             raise serializers.ValidationError('Please Select Who take Event')
-        # Perform other validations or processing here if needed
-        # ...
         return data
     
 
@@ -42,21 +40,5 @@ class LeadGetFollowUpSerializer(serializers.ModelSerializer):
     LeadID = LeadGetSerializer()
     class Meta:
         model = LeadFollowUp
-        fields = [
-            "LeadFollowupID",
-            "LeadID",
-            "Company",
-            "Brand",
-            "LeadFollowupCreatedDate",
-            "LeadPhonePicked",
-            "LeadStatus",
-            "LeadStatusDate",
-            "LeadEvent",
-            "LeadEventDate",
-            "LeadRep",
-            "LeadEventTakenBy",
-            "LeadFeeOffered",
-            "LeadReasonPhoneNotPicked",
-            "LeadServiceInterested"
-        ]
+        fields = "__all__"
 

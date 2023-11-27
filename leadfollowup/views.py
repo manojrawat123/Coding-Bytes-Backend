@@ -34,9 +34,6 @@ class LeadFollowupListCreateView(APIView):
             leadLastFollowUpserializer = LeadLastFollowUpSerializer(data = request.data)
             leadId = request.data.get("LeadID")
             serviceId = request.data.get("LeadServiceInterested")
-            print("------")
-            print(leadId)
-            print(serviceId)
             leadStatus = request.data.get("LeadStatus")
             leadData = Lead.objects.get(id = leadId)
             if leadData is None:
