@@ -2,7 +2,7 @@ from django.shortcuts import render
 from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework.views import APIView
 from myuser.renders import UserRenderer
-from myuser.serializers import MyUserRegisterSerializer, MyUserSerializers, MyUserLoginSerializer, UserProfileSerializer
+from myuser.serializers import MyUserRegisterSerializer, MyUserSerializers, MyUserLoginSerializer, UserProfileSerializer,UserNameSerializer
 from rest_framework.response import Response
 from rest_framework import status
 from django.contrib.auth import authenticate
@@ -85,20 +85,31 @@ class MyProfile(APIView):
     permission_classes = [IsAuthenticated]
     def get(self, request, format=None):
         serializer = UserProfileSerializer(request.user)
-        return Response(serializer.data, status=status.HTTP_200_OK)   
+        return Response(serializer.data, status=status.HTTP_200_OK)  
+
+class GetAllUser(APIView):
+    renderer_classes = [UserRenderer]
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request, format=None):
+        
+        if request.user.is_admin:
+            user = MyUser.objects.all()
+            serializer = UserNameSerializer(user, many=True) 
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        else:
+            return Response({"error": "Not Authenticated"}, status=status.HTTP_401_UNAUTHORIZED)
 
 
-class GetNameById(APIView):
+
     
+class GetNameById(APIView):
     renderer_classes = [UserRenderer]
     permission_classes = [IsAuthenticated]
     def get(self, request, id=None):
         if id is None:
             return Response({"error": "Method Not Allowed"}, status=status.HTTP_400_BAD_REQUEST)
-        
-        
-        userData =MyUser.objects.get(id=id)
-        
+        userData =MyUser.objects.get(id=id) 
         serializer = MyUserRegisterSerializer(userData)
         return Response(serializer.data)
 

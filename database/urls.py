@@ -15,7 +15,7 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path
-from myuser.views import UserRegistrationView, MyLogin, MyProfile, UserRegisterViewByID, GetNameById
+from myuser.views import UserRegistrationView, MyLogin, MyProfile, UserRegisterViewByID, GetNameById,GetAllUser
 from lead.views import LeadAddView, LeadDetailView,LeadFilterView
 from django.urls import path
 from service.views import ServiceListView, ServiceListById,GetServiceDetailsArrByID
@@ -33,7 +33,7 @@ from django.conf import settings
 from refundfees.views import FeesRefundApiView
 from paymentlink.views import PaymentLinkView, PaymentLinkViewGetUrl
 from batch.views import BatchApiView, BatchApiViewById
-from batchstudent.views import BatchStudentListView, BatchStudentByConvertedIdView
+from batchstudent.views import BatchStudentListView, BatchStudentByConvertedIdView,BatchForConverted
 from brand.views import BrandApiViewById
 from emailtemplate.views import EmailTemplateView
 from emaillog.views import EmailLogSheduleOnlyEmail, SaveEmailInLog
@@ -92,6 +92,8 @@ urlpatterns = [
     path('messagetemplate/',MessageTemplateView.as_view(),name="MessageTemplate"),
     path("messageshedule/", MessageLogSheduleOnlyEmail.as_view(), name="Message Shedule Only Email"),
     path("savemessage/", SaveMessageInLog.as_view(), name="Save Message In Log"),
-    path("convertedwithfeesdetails/", ConvertedStudentListWithFeesDetails.as_view(), name="Converted With Fees Details")
+    path("convertedwithfeesdetails/", ConvertedStudentListWithFeesDetails.as_view(), name="Converted With Fees Details"),
+    path("batchforconverted/", BatchForConverted.as_view(), name="Batch For Converted"),
+    path("getalluser/", GetAllUser.as_view(), name="Get All User"),
 ] + static(settings.MEDIA_URL, document_root= settings.MEDIA_ROOT)
 

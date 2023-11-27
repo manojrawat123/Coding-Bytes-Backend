@@ -1,7 +1,7 @@
 from rest_framework import serializers
 from batchstudent.models import BatchStudent
 from batch.serializers import BatchSerializers
-
+from brand.serializers import BrandSerializers
 
 class BatchStudentSerializer(serializers.ModelSerializer):
     class Meta:

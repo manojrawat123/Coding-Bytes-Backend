@@ -12,6 +12,8 @@ from leadlastfollowup.serializer import LeadLastFollowUpSerializer
 from leadlastfollowup.models import LeadLastFollowUp
 from lead.models import Lead
 from lead.serializer import LeadSerializer
+from service.models import Service
+from service.serializers import ServiceSerializer
 # from convertedstudent.models import convertedstudent
 
 class LeadFollowupListCreateView(APIView):
@@ -19,13 +21,21 @@ class LeadFollowupListCreateView(APIView):
     def get(self, request, id=None):
         if id is not None:
             customer = LeadFollowUp.objects.filter(Q(LeadID=id) & Q(LeadRep=request.user))
-            
+
             serializer = LeadGetFollowUpSerializer(customer, many=True)
+            for i in serializer.data:
+                lead_id = i["LeadID"]
+                lead_service_interested_objects = lead_id["LeadServiceInterested"]
+                lead_service_interested_ids = [item["id"] for item in lead_service_interested_objects]
+                avaible_services = Service.objects.exclude(id__in=lead_service_interested_ids)
+                services_serializer = ServiceSerializer(avaible_services, many=True)
+                i["available_services"] = services_serializer.data
+
             return Response(serializer.data)
         
         else:
-            fee = LeadFollowUp.objects.filter(LeadRep = request.user)
-            serializer = LeadGetFollowUpSerializer(fee, many=True)
+            leadfollowup = LeadFollowUp.objects.filter(LeadRep = request.user)
+            serializer = LeadGetFollowUpSerializer(leadfollowup, many=True)
             return Response(serializer.data)
  
     def post(self, request):  

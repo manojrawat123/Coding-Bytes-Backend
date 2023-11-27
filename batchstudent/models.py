@@ -11,7 +11,5 @@ class BatchStudent(models.Model):
     ConvertedID = models.ForeignKey(convertedstudent, on_delete=models.CASCADE)
     LeadId = models.ForeignKey(Lead, on_delete=models.CASCADE)
 
-    # You can add more fields and constraints as needed
-
     def __str__(self):
         return f"Conversion ID: {self.ID}"
