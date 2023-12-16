@@ -5,6 +5,7 @@ from brand.models import Brand
 from paymentmode.models import PaymentMode
 from paymenttype.models import PaymentType
 from service.models import Service 
+from myuser.models import MyUser
 
 # Create your models here.
 class Payment(models.Model):
@@ -26,3 +27,4 @@ class Payment(models.Model):
     payment_mode_id = models.ForeignKey(PaymentMode, on_delete=models.CASCADE)
     payment_status = models.CharField(max_length=20, default='Approved')
     payment_current_status = models.CharField(max_length=20, default='Active')
+    user_id = models.ForeignKey(MyUser, on_delete=models.CASCADE)

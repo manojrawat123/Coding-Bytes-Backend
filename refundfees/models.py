@@ -7,9 +7,9 @@ from payment.models import Payment
 from paymenttype.models import PaymentType
 from company.models import Company
 from brand.models import Brand
-
+from myuser.models import MyUser
 class FeeRefund(models.Model):
-    FeeID = models.AutoField(primary_key=True)
+    FeeRefundID = models.AutoField(primary_key=True)
     LeadID = models.ForeignKey(Lead, on_delete=models.CASCADE)
     FeeRefunded = models.DecimalField(max_digits=10, decimal_places=2)
     FeeRefundedCreatedDateTime = models.DateTimeField(auto_now_add=True)
@@ -19,7 +19,7 @@ class FeeRefund(models.Model):
     StudentID = models.ForeignKey(Customer, on_delete=models.CASCADE)
     ConvertedID = models.ForeignKey(convertedstudent, on_delete=models.CASCADE)
     UpdatedBY = models.CharField(max_length=400)
-    Representative = models.CharField(max_length=200)
+    Representative = models.ForeignKey(MyUser, on_delete=models.CASCADE)
     PaymentID = models.ForeignKey(Payment, on_delete=models.CASCADE)
     PaymentType = models.ForeignKey(PaymentType, on_delete=models.CASCADE)
     CustomerStatus = models.CharField(max_length=20, default="Active")

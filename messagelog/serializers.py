@@ -1,12 +1,13 @@
 from rest_framework import serializers
 # from emailshedule.models import EmailSchedule
 from messagelog.models import MessageLog
+from messagetemplate.serializers import MessageTemplateSerializers
 
-class MessageLogSerializer(serializers.Serializer):
-    template_id = serializers.CharField(max_length=200)
-    phone = serializers.ListField(child=serializers.CharField(), required=True)
-    body = serializers.CharField(max_length=5000)
-
+class MessageLogSerializer(serializers.ModelSerializer):
+    TemplateID = MessageTemplateSerializers()
+    class Meta:
+        model = MessageLog
+        fields = "__all__"
 
 class MessageLogSaveSerializer(serializers.ModelSerializer):
     class Meta:

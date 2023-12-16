@@ -9,6 +9,15 @@ from rest_framework import status
 import datetime
 from django.conf import settings
 from django.core.mail import send_mail ,EmailMessage
+from django.http import JsonResponse
+import requests
+from messagetemplate.models import SMSTemplate
+from messagelog.models import MessageLog
+from brand.models import Brand
+from company.models import Company
+from myuser.models import MyUser
+from service.models import Service
+from messagelog.serializers import MessageLogSaveSerializer
 
 
 
@@ -74,4 +83,47 @@ class MessageSheduleOnlyEmail(APIView):
                 print(f"Email sending failed: {e}")
                 return Response({"msg": "Email Failed"})
         return Response(serializers.errors, status=400)
+
+ 
+def send_sms(tem_id=None,leadID = None,name = None, phone=None, brandId=None, serviceId=None,leadRepId=None,companyId=None, payment=None, payment_id=None):
+    
+    auth_key = '209639AxJLxY1qE60519474P1'
+    message_body = SMSTemplate.objects.get(TemplateID = tem_id).TemplateMessage
+    brand = Brand.objects.get(id = brandId).BrandName
+    leadRep = MyUser.objects.get(id= leadRepId).name
+    service = Service.objects.get(id = serviceId).ServiceName
+    message_body_real = message_body.format(name=name, phone= phone, brand= brand, leadRep=leadRep,service=service , payment=payment, payment_id=payment_id)
+    sender_id = 'CDGBYT'
+    route = '4'
+    country_code = '+91'
+    dlt_template_id = 1207161520341994378
+    msg91_url = 'https://api.msg91.com/api/sendhttp.php'
+    params = {
+        'authkey': auth_key,
+        'mobiles': phone,
+        'message': message_body_real,
+        'sender': sender_id,
+        'route': route,
+        'country': country_code,
+        'DLT_TE_ID': dlt_template_id
+    }
+    try:
+        response = requests.post(msg91_url, params=params)
+        response.raise_for_status()
+        print(response)
+        log_data = {
+            "TemplateID": tem_id,
+        "CompanyID": companyId,
+        "BrandId":brandId,
+        "LeadId":leadID,
+        }
+        message_log_serializer = MessageLogSaveSerializer(data=log_data)
+        if message_log_serializer.is_valid():
+            message_log_serializer.save()
+        else:
+            return Response(message_log_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    except Exception as e:
+        return Response({"error": "Message Failed"}, status=status.HTTP_400_BAD_REQUEST)
+
+
        

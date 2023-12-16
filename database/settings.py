@@ -170,7 +170,7 @@ EMAIL_HOST = "smtp.gmail.com"
 EMAIL_USE_TLS = True
 EMAIL_PORT = 587
 EMAIL_HOST_USER ='positive.mind.123456789@gmail.com'
-EMAIL_HOST_PASSWORD = "iwrxzdadrwetfbkl"
+EMAIL_HOST_PASSWORD = "vdhqzwyeefhsfzxs"
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 
@@ -202,10 +202,9 @@ SIMPLE_JWT = {
     'JTI_CLAIM': 'jti',
 }
 
-PASSWORD_RESET_TIMEOUT=900          # 900 Sec = 15 Min
-
+PASSWORD_RESET_TIMEOUT=900        
 CORS_ALLOWED_ORIGINS = [
-    "http://localhost:5173",  # Add the origins you want to allow here
+    "http://localhost:5173",  
 ]
 
 # Optional: Allow all headers and methods for simplicity in development

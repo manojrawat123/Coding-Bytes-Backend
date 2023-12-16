@@ -37,7 +37,10 @@ class Lead(models.Model):
             ("Only Wanted Information", "Only Wanted Information"),  
             ("Other", "Other"), 
             ("Try Next Time", "Try Next Time"),             
-            ("Lead Converted", "Lead Converted"),             
+            ("Lead Converted", "Lead Converted"), 
+            ("Demo Happened", "Demo Happened") ,
+            ("Visit Happened", "Visit Happened") 
+
         ])
     DND = models.BooleanField(default=False)
     LeadRepresentativePrimary = models.ForeignKey(MyUser, on_delete=models.CASCADE, related_name='LeadRepresentativePrimary')

@@ -21,7 +21,6 @@ class LeadFollowupListCreateView(APIView):
     def get(self, request, id=None):
         if id is not None:
             customer = LeadFollowUp.objects.filter(Q(LeadID=id) & Q(LeadRep=request.user))
-
             serializer = LeadGetFollowUpSerializer(customer, many=True)
             for i in serializer.data:
                 lead_id = i["LeadID"]
@@ -29,8 +28,7 @@ class LeadFollowupListCreateView(APIView):
                 lead_service_interested_ids = [item["id"] for item in lead_service_interested_objects]
                 avaible_services = Service.objects.exclude(id__in=lead_service_interested_ids)
                 services_serializer = ServiceSerializer(avaible_services, many=True)
-                i["available_services"] = services_serializer.data
-
+                i["available_services"] = services_serializer.data  
             return Response(serializer.data)
         
         else:
@@ -47,6 +45,7 @@ class LeadFollowupListCreateView(APIView):
             leadStatus = request.data.get("LeadStatus")
             leadData = Lead.objects.get(id = leadId)
             if leadData is None:
+                print("debug 1")
                 return Response({"error": "Lead Id not exists"}, status=status.HTTP_400_BAD_REQUEST)
             leadSerializer = LeadSerializer(leadData, data={"LeadStatus": leadStatus}, partial=True)
             

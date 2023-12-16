@@ -39,6 +39,8 @@ class LeadLastFollowUp(models.Model):
             ("Only Wanted Information", "Only Wanted Information"), 
             ("Other", "Other"),
             ("Try Next Time", "Try Next Time"), 
+            ("Demo Happened", "Demo Happened") ,
+            ("Visit Happened", "Visit Happened") 
         ],
         null=True
     )

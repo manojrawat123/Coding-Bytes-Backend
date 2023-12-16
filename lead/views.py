@@ -21,6 +21,11 @@ from leadlastfollowup.serializer import LeadLastFollowUpSerializer
 from myuser.models import MyUser
 from django.db.models import Min
 from usercourse.models import UserCourse
+from messageshedule.views import send_sms
+from brand.models import Brand
+from service.models import Service
+from emailshedule.views import custom_email_func
+from datetime import date, datetime
 
 # Create your views here.
 class LeadAddView(APIView):
@@ -35,8 +40,7 @@ class LeadAddView(APIView):
         if userID is None:
             # First Filter LIst of the course Assign to user
             courseAssign = list(UserCourse.objects.filter(Q(CourseID = courseId[0]) & Q(BrandID = brandId) & Q(CompanyID=companyID )).values_list("UserID", flat=True))
-            print(courseId , brandId, companyID)
-            print(courseAssign)
+            
 
             # Second Filter List Of Active User
             myuser = list(MyUser.objects.filter(Q(brand = brandId) & Q (is_active = True)).values_list("id", flat=True))
@@ -45,12 +49,12 @@ class LeadAddView(APIView):
             if (len(courseAssignActive) == 0):
                 print("No Active User Allocated For this Brand")
                 return Response({"Error": "No Brand Allocated"}, status= status.HTTP_400_BAD_REQUEST)
-            elif (len(courseAssignActive) ==1):
+            elif (len(courseAssignActive) == 1):
                 request.data["LeadRepresentativePrimary"] = courseAssignActive[0]
                 request.data["LeadRepresentativeSecondary"] = courseAssignActive[0]
                 userID = courseAssignActive[0]
             # Thirld Filter List of smallest Lead Add
-            elif(len(courseAssignActive )> 1):
+            elif(len(courseAssignActive ) > 1):
                 smallest_weightage = UserCourse.objects.aggregate(Min('CourseWeightage'))['CourseWeightage__min']
                 user_courses_with_smallest_weightage = list(UserCourse.objects.filter(CourseWeightage=smallest_weightage).values_list("UserID", flat=True))
                 courseAssignActiveSmallest = [x for x in courseAssignActive if x in user_courses_with_smallest_weightage]
@@ -77,9 +81,7 @@ class LeadAddView(APIView):
 
         if leadserializer.is_valid(raise_exception=True):
             leadserializer.save()
-            # LeadFollowUp Serializer
             serviceIntrested = request.data.get("LeadServiceInterested")
-            
             try:
                 for i in serviceIntrested:
                     myData = {
@@ -103,14 +105,22 @@ class LeadAddView(APIView):
                             "LeadLastFollowUpError": leadLastFollowUpserializer.errors ,
                         }
                         return Response(combine_error, status=status.HTTP_400_BAD_REQUEST)
-                return Response(leadFollowupserializer.data, status=status.HTTP_201_CREATED)
+                for i in courseId:
+                    # send_sms(1, leadID = leadserializer.data.get("id"), name= request.data.get("LeadName"), phone=request.data.get("LeadPhone"), brandId=brandId, serviceId=i, companyId=companyID,leadRepId=userID) 
+                    try:
+                        leadID = leadserializer.data.get("id")
+                        leadObj = Lead.objects.get(id = leadID)
+                        custom_email_func(4, newLead=True,leadObj=leadObj, serviceID = i,)
+                    except Exception as e:
+                        print("Some Error Occured ")
+                        print(e)
                 
+                return Response(leadFollowupserializer.data, status=status.HTTP_201_CREATED)  
             except Exception as e:
+                print(e)
                 print("ïnternal server error!!")
                 return Response({"Msg":"Internal Server Error"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-            
         else:
-            # Handle validation errors if the serializer is not valid
             return Response({"error": "Validation failed", "details": leadserializer.errors})
         
    
@@ -187,20 +197,64 @@ class LeadFilterView(generics.ListCreateAPIView):
             queryset = queryset.filter(
                 Q(LeadName__icontains=name)&
                 Q(LeadPhone__icontains=phone)
-                )
-            
+                ) 
         elif name:
-            queryset = queryset.filter(Q(LeadName__icontains=name))
-        
+            queryset = queryset.filter(Q(LeadName__icontains=name)) 
         elif email:
-            queryset = queryset.filter(Q(LeadName__icontains=email))
-        
+            queryset = queryset.filter(Q(LeadName__icontains=email))  
         elif phone:
             queryset = queryset.filter(Q(LeadName__icontains=phone))
-
-
         return queryset
 
+
+class AddCourseLeadView(APIView):
+    def put(self, request,id=None):
+        # Method Not Allowed
+        if id is None or request.data.get("LeadServiceInterested") is None:
+            return Response({"Msg": "Id is None"}, status=status.HTTP_400_BAD_REQUEST)
+        try:
+            lead_instance = Lead.objects.get(id=id)
+            service_interested_data = request.data.get('LeadServiceInterested', [])
+            existing_service_interested = list(lead_instance.LeadServiceInterested.values_list('id', flat=True))
+            updated_service_interested = list(set(existing_service_interested) | set(service_interested_data))
+            lead_instance.LeadServiceInterested.set(updated_service_interested)
+            request.data['LeadServiceInterested'] = updated_service_interested
+            print(lead_instance.LeadServiceInterested)
+            for i in service_interested_data:
+                try:
+                    lead_follow_up = {
+                        "LeadID" : id,
+                        "Company": lead_instance.Company.id,
+                        "Brand": lead_instance.Brand.id,
+                        "LeadStatus": "Fresh",
+                        "LeadRep": lead_instance.LeadRepresentativePrimary.id, 
+                        "LeadServiceInterested": i ,
+                        "LeadStatusDate":  datetime.combine(date.today(), datetime.min.time())
+                    }
+                    leadFollowUpSerializer = LeadFollowupSerializer(data=lead_follow_up)
+                    lead_last_follow_serializer = LeadLastFollowUpSerializer(data=lead_follow_up)
+                    if leadFollowUpSerializer.is_valid():
+                        leadFollowUpSerializer.save()
+                    else:
+                        return Response(leadFollowUpSerializer.errors, status=status.HTTP_400_BAD_REQUEST)
+                    
+                    if lead_last_follow_serializer.is_valid():
+                        lead_last_follow_serializer.save()
+                    else:
+                        return Response(lead_last_follow_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+                except Exception as e:
+                    print("Some Error Occured")
+                    print(e)
+                    return Response({"error": "Some Error Occured In Backend"}, status=status.HTTP_400_BAD_REQUEST)
+        except Lead.DoesNotExist:
+            return Response({"Msg": "Lead not found"}, status=status.HTTP_404_NOT_FOUND)
+        serializer = LeadSerializer(lead_instance, data=request.data, partial=True)
+        if serializer.is_valid():
+            serializer.save()
+
+            return Response({"Msg":" Updated Sucessfully!!"})
+        else:
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 

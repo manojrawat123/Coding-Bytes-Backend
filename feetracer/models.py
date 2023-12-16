@@ -15,6 +15,7 @@ class Fee(models.Model):
     fee_received = models.DecimalField(max_digits=10, decimal_places=2)
     fee_created_datetime = models.DateField()
     fee_payment_datetime = models.DateField()
+    next_due_date = models.DateField(default="2023-03-03")
     receipt_number = models.CharField(max_length=50)
     student = models.ForeignKey(Customer, on_delete=models.CASCADE, related_name='fees')
     payment_mode = models.ForeignKey(PaymentMode, on_delete=models.CASCADE)
