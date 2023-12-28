@@ -80,15 +80,14 @@ class CustomerList(APIView):
             return Response(serializer.errors, status= status.HTTP_400_BAD_REQUEST)
 
 
-
-
-
-
 class CustomerDetail(APIView):
     permission_classes = [IsAuthenticated]
     def get(self, request, id = None):
         if id is not None:
-            customer = Customer.objects.get(CustomerID = id)
+            try:
+                customer = Customer.objects.get(CustomerID = id)
+            except Exception as e:
+                return Response({"error": "No Data Found"}, status=status.HTTP_404_NOT_FOUND)
             customer_serializer = CustomerGetSerializer(customer)
             return Response(customer_serializer.data, status=status.HTTP_200_OK)
         else:

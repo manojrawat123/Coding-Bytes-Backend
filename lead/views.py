@@ -26,6 +26,9 @@ from brand.models import Brand
 from service.models import Service
 from emailshedule.views import custom_email_func
 from datetime import date, datetime
+from leadScource.models import LeadSource
+from leadScource.serializers import LeadScourceSerializers
+from service.serializers import ServiceSerializer
 
 # Create your views here.
 class LeadAddView(APIView):
@@ -128,7 +131,6 @@ class LeadAddView(APIView):
         if id is not None:
             try:
                 lead = Lead.objects.get(Q(id=id) & Q(LeadRepresentativeSecondary=request.user))
-                print(lead)
                 serializer = LeadGetSerializer(lead)
 
                 return Response(serializer.data)
@@ -136,7 +138,7 @@ class LeadAddView(APIView):
                 return Response({"Msg": "Not Found"}, status=status.HTTP_404_NOT_FOUND)      
         else:    
             if request.user.is_admin:
-                lead = Lead.objects.all()
+                lead = Lead.objects.all() 
             else:
                 lead = Lead.objects.filter(LeadRepresentativePrimary=request.user)  
 
@@ -149,7 +151,6 @@ class LeadAddView(APIView):
             lead_instance = Lead.objects.get(id=id)
         except Lead.DoesNotExist:
             return Response({"Msg": "Lead not found"}, status=status.HTTP_404_NOT_FOUND)
-        print("This put request is running")
         serializer = LeadSerializer(lead_instance, data=request.data, partial=True)
         if serializer.is_valid():
             serializer.save()
@@ -264,3 +265,21 @@ class LeadDetailView(RetrieveAPIView):
     queryset = Lead.objects.all()
 
 
+
+
+# DashBoard Page Api
+class AddNewLeadGetApi(APIView):
+    permission_classes = [IsAuthenticated]
+    def get(self, request, id = None):
+        if id == None:
+            return Response({"error": "Method Not Allowed"}, status=status.HTTP_405_METHOD_NOT_ALLOWED)
+        else: 
+
+            # Lead Scource
+            leadScource = LeadSource.objects.filter(Brand = id)
+            lead_scource_serializer = LeadScourceSerializers(leadScource,many=True)
+
+            # Get Services 
+            services = Service.objects.filter(Brand_id=id)
+            serializer = ServiceSerializer(services, many=True)
+            return Response({"lead_scource": lead_scource_serializer.data, "service": serializer.data}, status=status.HTTP_200_OK)

@@ -16,7 +16,7 @@ class LeadScourceApiView(APIView):
         return Response(serializer.data, status=status.HTTP_200_OK)
 
 
-class LeadScourceApiById(APIView):
+class LeadScourceApiByBrandId(APIView):
     # permission_classes = [IsAuthenticated]
     def get(self, format=None, id = None):
         if (id == None): 

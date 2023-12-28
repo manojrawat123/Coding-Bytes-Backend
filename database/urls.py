@@ -16,7 +16,7 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path
 from myuser.views import UserRegistrationView, MyLogin, MyProfile, UserRegisterViewByID, GetNameById,GetAllUser
-from lead.views import LeadAddView, LeadDetailView,LeadFilterView, AddCourseLeadView
+from lead.views import LeadAddView, LeadDetailView,LeadFilterView, AddCourseLeadView,AddNewLeadGetApi
 from django.urls import path
 from service.views import ServiceListView, ServiceListById,GetServiceDetailsArrByID
 from leadfollowup.views import LeadFollowupListCreateView, LeadFollowupDetailView
@@ -35,9 +35,9 @@ from paymentlink.views import PaymentLinkView, PaymentLinkViewGetUrl
 from batch.views import BatchApiView, BatchApiViewById
 from batchstudent.views import BatchStudentListView, BatchStudentByConvertedIdView,BatchForConverted
 from brand.views import BrandApiViewById
-from emailtemplate.views import EmailTemplateView
+from emailtemplate.views import EmailTemplateView,EmailTemplateFormDataGet
 from emaillog.views import EmailLogSheduleOnlyEmail, SaveEmailInLog
-from leadScource.views import LeadScourceApiView,LeadScourceApiById
+from leadScource.views import LeadScourceApiView,LeadScourceApiByBrandId
 from messagetemplate.views import MessageTemplateView
 from messagelog.views import MessageLogSheduleOnlyEmail, SaveMessageInLog
 
@@ -52,11 +52,12 @@ urlpatterns = [
     path('lead/', LeadAddView.as_view(), name='addlead'),
     path('leadcourseupdate/<int:id>/', AddCourseLeadView.as_view(), name='add_course_lead_view'),
     path('lead/<int:id>/', LeadAddView.as_view(), name='update-lead'),
+    path('dashboard/<int:id>/', AddNewLeadGetApi.as_view(), name='dashboard-api'),
     path('brand/<int:id>/', BrandApiViewById.as_view(), name='brand'),
     # path('lead/<int:pk>/', LeadDetailView.as_view(), name='lead-detail'),
     path('leadfilter/', LeadFilterView.as_view(), name='lead-filter-view'),
     path('leadscource/', LeadScourceApiView.as_view(), name='lead-scource-view'),
-    path('leadscource/<int:id>/', LeadScourceApiById.as_view(), name='lead-scource-view-by-id'),
+    path('leadscource/<int:id>/', LeadScourceApiByBrandId.as_view(), name='lead-scource-view-by-id'),
     path('services/<int:brand_id>/', ServiceListView.as_view(), name='service-list'),
     path('servicesarrbyId/', GetServiceDetailsArrByID.as_view(), name='selected-service-list'),
     path('servicesbyid/<int:id>/', ServiceListById.as_view(), name='service-obj-by-id'),
@@ -101,5 +102,6 @@ urlpatterns = [
     path("getalluser/", GetAllUser.as_view(), name="Get All User"),
     path("servicepaymenttypemodescource/<int:brand_id>/",PaymentModeTypeService.as_view(), name="servicepaymenttypemodescource" ),
     path("refunddisplayview/<int:brand_id>/<int:convert_id>/",FeesRefundPageDisplayView.as_view(), name="refundfeesdisplayview"),
+    path("emailtemplateformdata/<int:brand_id>/", EmailTemplateFormDataGet.as_view(), name="emailformdata")
 ] + static(settings.MEDIA_URL, document_root= settings.MEDIA_ROOT)
 

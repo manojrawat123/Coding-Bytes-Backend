@@ -21,12 +21,12 @@ class LeadLastFollowupListCreateView(generics.ListCreateAPIView):
      
 
 class LeadLastFollowUpByLeadId(APIView):
-    def get(self, request, id=None):
-        if id is not None:
+    def get(self, request, id=None): 
+        if id is not None:  
             customer = LeadLastFollowUp.objects.filter(LeadID=id)
             serializer = LeadLastFollowupGetSerializer(customer, many=True)
-            return Response(serializer.data)
-        else:
+            return Response(serializer.data)  
+        else: 
             lastfollowup = LeadLastFollowUp.objects.all()
             serializer = LeadLastFollowupGetSerializer(lastfollowup, many=True)
             return Response(serializer.data)
@@ -51,7 +51,6 @@ class LeadLastFollowUpByLeadId(APIView):
 
 
 class LeadLastFollowUpNotConverted(APIView):
-
     def get(self, request):
         status_order = {
             'Fresh': 1,'Ready To Enroll': 2,'Visit scheduled': 3,'Demo scheduled': 4,"Highly Intersted": 5,"Least Intersted": 6,"Distance Issue": 7,"Pricing Issue": 8,"Already Taken Service": 9,"Quality Issue": 10,"Not Interested Anymore": 11,"Did Not Enquire": 12,"Only Wanted Information": 13,"Other": 14,

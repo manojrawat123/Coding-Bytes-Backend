@@ -39,20 +39,4 @@ class LeadLastFollowupGetSerializer(serializers.ModelSerializer):
     LeadID = LeadGetSerializer()
     class Meta:
         model = LeadLastFollowUp
-        fields = [
-            "LeadFollowupID",
-            "LeadID",
-            "Company",
-            "Brand",
-            "LeadFollowupCreatedDate",
-            "LeadPhonePicked",
-            "LeadStatus",
-            "LeadStatusDate",
-            "LeadEvent",
-            "LeadEventDate",
-            "LeadRep",
-            "LeadEventTakenBy",
-            "LeadFeeOffered",
-            "LeadReasonPhoneNotPicked",
-            "LeadServiceInterested"
-        ]
+        fields ="__all__"
