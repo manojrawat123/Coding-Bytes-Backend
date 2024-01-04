@@ -204,7 +204,7 @@ SIMPLE_JWT = {
 
 PASSWORD_RESET_TIMEOUT=900        
 CORS_ALLOWED_ORIGINS = [
-    "http://localhost:5173",  
+    "http://localhost:5173",
 ]
 
 # Optional: Allow all headers and methods for simplicity in development

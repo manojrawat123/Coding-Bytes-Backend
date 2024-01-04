@@ -264,9 +264,6 @@ class LeadDetailView(RetrieveAPIView):
     serializer_class = LeadSerializer
     queryset = Lead.objects.all()
 
-
-
-
 # DashBoard Page Api
 class AddNewLeadGetApi(APIView):
     permission_classes = [IsAuthenticated]
