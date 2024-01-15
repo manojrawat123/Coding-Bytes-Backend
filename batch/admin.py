@@ -3,15 +3,15 @@ from batch.models import Batch
 
 
 class BatchAdmin(admin.ModelAdmin):
-    list_display = ('BatchID', 'BatchName', 'BatchDescription', 'BatchMode', 'BatchTags', 'BatchTeacher', 'BatchStartDate', 'BatchEndDate', 'BatchTime', 'BatchEndTime', 'Status')
-    list_filter = ('BatchMode', 'BatchTags', 'Status')
+    list_display = ('BatchID', 'BatchName', 'BatchDescription', 'BatchMode', 'BatchTags', 'BatchTeacher', 'BatchStartDate', 'BatchEndDate', 'BatchTime', 'BatchEndTime', 'Status','BatchCreatedDate')
+    list_filter = ('BatchMode', 'BatchTags', 'Status', 'BatchCreatedDate')
     search_fields = ('BatchName', 'BatchDescription')
     date_hierarchy = 'BatchCreatedDate'
 
     # Customize the form for adding and editing Batch objects
     fieldsets = (
         ('Basic Information', {
-            'fields': ('BatchName', 'BatchDescription', 'BatchMode', 'BatchTags', 'BatchTeacher', 'Status')
+            'fields': ('BatchName', 'BatchDescription', 'BatchMode', 'BatchTags', 'BatchTeacher', 'Status',"BatchCreatedDate")
         }),
         ('Schedule Information', {
             'fields': ('BatchStartDate', 'BatchEndDate', 'BatchTime', 'BatchEndTime')

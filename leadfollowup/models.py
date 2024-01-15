@@ -43,7 +43,7 @@ class LeadFollowUp(models.Model):
         ],
         null=True
     )
-    LeadStatusDate = models.DateTimeField(default=timezone.now, blank=True,null=True)
+    LeadStatusDate = models.DateTimeField(default=timezone.now)
     LeadEvent = models.CharField(
         max_length=20,
         choices=[

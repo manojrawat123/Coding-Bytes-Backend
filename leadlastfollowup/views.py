@@ -11,6 +11,8 @@ from rest_framework.views import APIView
 from convertedstudent.models import convertedstudent
 from rest_framework import status
 from django.db.models import Q
+from datetime import datetime, timedelta
+from django.utils import timezone
 
 
 
@@ -55,8 +57,19 @@ class LeadLastFollowUpNotConverted(APIView):
         status_order = {
             'Fresh': 1,'Ready To Enroll': 2,'Visit scheduled': 3,'Demo scheduled': 4,"Highly Intersted": 5,"Least Intersted": 6,"Distance Issue": 7,"Pricing Issue": 8,"Already Taken Service": 9,"Quality Issue": 10,"Not Interested Anymore": 11,"Did Not Enquire": 12,"Only Wanted Information": 13,"Other": 14,
         }
-        followups_not_converted = LeadLastFollowUp.objects.exclude(LeadID__in=convertedstudent.objects.values('LeadID'))
-
+        now = timezone.now().date()
+        last_month = now - timedelta(days=30)
+        
+        to_date_pr = request.query_params.get('to_date', now)
+        from_date_pr = request.query_params.get('from_date', last_month) 
+        all_leads_params = request.query_params.get('all', None)  
+        from_date = datetime.strptime(f"{to_date_pr}", "%Y-%m-%d").strftime("%Y-%m-%dT23:59:00Z")
+        to_date = datetime.strptime(f"{from_date_pr}", "%Y-%m-%d").strftime("%Y-%m-%dT00:00:00Z")  
+        # followups_not_converted = LeadLastFollowUp.objects.exclude(LeadID__in=convertedstudent.objects.values('LeadID'))
+        if request.user.is_admin:
+            followups_not_converted = LeadLastFollowUp.objects.filter(~Q(LeadID__in=convertedstudent.objects.values('LeadID')) & Q(LeadStatusDate__lt = from_date) & Q(LeadStatusDate__gt = to_date) )
+        else:
+            followups_not_converted = LeadLastFollowUp.objects.filter(~Q(LeadID__in=convertedstudent.objects.values('LeadID')) & Q(LeadRepresentativePrimary=request.user) & Q(LeadStatusDate__lt = from_date) & Q(LeadStatusDate__gt = to_date))
         sorted_followups = sorted(followups_not_converted, key=lambda x: status_order.get(x.LeadStatus, float('inf')))
 
         serializer = LeadLastFollowupGetSerializer(sorted_followups, many=True)

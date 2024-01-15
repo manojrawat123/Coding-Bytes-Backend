@@ -1,5 +1,6 @@
 from django.db import models
 from myuser.models import MyUser
+from django.utils import timezone
 
 class Batch(models.Model):
     BatchID = models.AutoField(primary_key=True)
@@ -16,7 +17,7 @@ class Batch(models.Model):
     BatchTeacher = models.ForeignKey(MyUser, on_delete=models.CASCADE)
     BatchTeacherName = models.CharField(max_length=200)
     BatchStaffAssigned = models.CharField(max_length=300)
-    BatchCreatedDate = models.DateTimeField(auto_now_add=True)
+    BatchCreatedDate = models.DateTimeField(default=timezone.now)
     BatchStartDate = models.DateTimeField()
     BatchEndDate = models.DateTimeField()
     BatchTime = models.TimeField()

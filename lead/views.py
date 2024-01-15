@@ -29,6 +29,9 @@ from datetime import date, datetime
 from leadScource.models import LeadSource
 from leadScource.serializers import LeadScourceSerializers
 from service.serializers import ServiceSerializer
+from lead.googletoken import verify_not_robot_func
+from datetime import datetime, timedelta
+from django.utils import timezone
 
 # Create your views here.
 class LeadAddView(APIView):
@@ -40,46 +43,57 @@ class LeadAddView(APIView):
         brandId = request.data.get("Brand")
         courseId = request.data.get("LeadServiceInterested")
         companyID = request.data.get("Company")
+        # Code Of FaceBook Leads
         if userID is None:
-            # First Filter LIst of the course Assign to user
-            courseAssign = list(UserCourse.objects.filter(Q(CourseID = courseId[0]) & Q(BrandID = brandId) & Q(CompanyID=companyID )).values_list("UserID", flat=True))
+            token = request.data.get("captcha_token") 
+            try:
+
+                response = verify_not_robot_func(token)
+                print(response)
+            except Exception as e:
+                return Response({"error": "You Are not a Robot"}, status=status.HTTP_400_BAD_REQUEST)
+            # Only Save the Code When Valid Token
+            if response == "humman":
+                courseAssign = list(UserCourse.objects.filter(Q(CourseID = courseId[0]) & Q(BrandID = brandId) & Q(CompanyID=companyID )).values_list("UserID", flat=True))
+                myuser = list(MyUser.objects.filter(Q(brand = brandId) & Q (is_active = True)).values_list("id", flat=True))
+                courseAssignActive = [x for x in myuser if x in courseAssign]
+                if (len(courseAssignActive) == 0):
+                    print("No Active User Allocated For this Brand")
+                    return Response({"Error": "No Brand Allocated"}, status= status.HTTP_400_BAD_REQUEST)
+                elif (len(courseAssignActive) == 1):
+                    request.data["LeadRepresentativePrimary"] = courseAssignActive[0]
+                    request.data["LeadRepresentativeSecondary"] = courseAssignActive[0]
+                    userID = courseAssignActive[0]
+                # Thirld Filter List of smallest Lead Add
+                elif(len(courseAssignActive ) > 1):
+                    smallest_weightage = UserCourse.objects.aggregate(Min('CourseWeightage'))['CourseWeightage__min']
+                    user_courses_with_smallest_weightage = list(UserCourse.objects.filter(CourseWeightage=smallest_weightage).values_list("UserID", flat=True))
+                    courseAssignActiveSmallest = [x for x in courseAssignActive if x in user_courses_with_smallest_weightage]
+
+                    # Fourth Filter Last Lead
+                    if (len(courseAssignActiveSmallest) == 1):
+                        request.data["LeadRepresentativePrimary"] = courseAssignActiveSmallest[0]
+                        
+                        request.data["LeadRepresentativeSecondary"] = courseAssignActive[0]
+                        userID = courseAssignActiveSmallest[0]
+
+                    elif (len(courseAssignActiveSmallest ) > 1):
+                        last_lead_user = Lead.objects.all().latest("id").LeadRepresentativePrimary.id
+                        courseAssignActSmNotLastLead = [x for x in courseAssignActiveSmallest if x  != last_lead_user]
+                        userID = courseAssignActSmNotLastLead[0]
+                        request.data["LeadRepresentativePrimary"] =courseAssignActSmNotLastLead[0]
+                        request.data["LeadRepresentativeSecondary"] = courseAssignActive[0]
+                        
+                userPriority = UserCourse.objects.get(Q(UserID = userID)& Q(CourseID =courseId[0]))
+                userPriority.CourseWeightage = userPriority.CourseWeightage + 1
+                userPriority.save()
+                # return Response({"message": "Lead saved successfully"})
+            else:
+                # Return an error response if the reCAPTCHA assessment is invalid
+                return Response({"error": "You are not humman"}, status=400)
+                
+
             
-
-            # Second Filter List Of Active User
-            myuser = list(MyUser.objects.filter(Q(brand = brandId) & Q (is_active = True)).values_list("id", flat=True))
-            courseAssignActive = [x for x in myuser if x in courseAssign]
-            print(courseAssignActive)
-            if (len(courseAssignActive) == 0):
-                print("No Active User Allocated For this Brand")
-                return Response({"Error": "No Brand Allocated"}, status= status.HTTP_400_BAD_REQUEST)
-            elif (len(courseAssignActive) == 1):
-                request.data["LeadRepresentativePrimary"] = courseAssignActive[0]
-                request.data["LeadRepresentativeSecondary"] = courseAssignActive[0]
-                userID = courseAssignActive[0]
-            # Thirld Filter List of smallest Lead Add
-            elif(len(courseAssignActive ) > 1):
-                smallest_weightage = UserCourse.objects.aggregate(Min('CourseWeightage'))['CourseWeightage__min']
-                user_courses_with_smallest_weightage = list(UserCourse.objects.filter(CourseWeightage=smallest_weightage).values_list("UserID", flat=True))
-                courseAssignActiveSmallest = [x for x in courseAssignActive if x in user_courses_with_smallest_weightage]
-
-                # Fourth Filter Last Lead
-                if (len(courseAssignActiveSmallest) == 1):
-                    request.data["LeadRepresentativePrimary"] = courseAssignActiveSmallest[0]
-                    
-                    request.data["LeadRepresentativeSecondary"] = courseAssignActive[0]
-                    userID = courseAssignActiveSmallest[0]
-                    print(request.data)
-
-                elif (len(courseAssignActiveSmallest ) > 1):
-                    last_lead_user = Lead.objects.all().latest("id").LeadRepresentativePrimary.id
-                    courseAssignActSmNotLastLead = [x for x in courseAssignActiveSmallest if x  != last_lead_user]
-                    userID = courseAssignActSmNotLastLead[0]
-                    request.data["LeadRepresentativePrimary"] =courseAssignActSmNotLastLead[0]
-                    request.data["LeadRepresentativeSecondary"] = courseAssignActive[0]
-                    
-            userPriority = UserCourse.objects.get(Q(UserID = userID)& Q(CourseID =courseId[0]))
-            userPriority.CourseWeightage = userPriority.CourseWeightage + 1
-            userPriority.save()
 
 
         if leadserializer.is_valid(raise_exception=True):
@@ -115,13 +129,11 @@ class LeadAddView(APIView):
                         leadObj = Lead.objects.get(id = leadID)
                         custom_email_func(4, newLead=True,leadObj=leadObj, serviceID = i,)
                     except Exception as e:
-                        print("Some Error Occured ")
-                        print(e)
+                        print("Email Fail")
                 
                 return Response(leadFollowupserializer.data, status=status.HTTP_201_CREATED)  
             except Exception as e:
-                print(e)
-                print("ïnternal server error!!")
+                print("Internal Server Error")
                 return Response({"Msg":"Internal Server Error"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
         else:
             return Response({"error": "Validation failed", "details": leadserializer.errors})
@@ -136,14 +148,34 @@ class LeadAddView(APIView):
                 return Response(serializer.data)
             except ObjectDoesNotExist:  # Catch ObjectDoesNotExist exception
                 return Response({"Msg": "Not Found"}, status=status.HTTP_404_NOT_FOUND)      
-        else:    
-            if request.user.is_admin:
-                lead = Lead.objects.all() 
+        else:   
+            now = timezone.now().date()
+            last_month = now - timedelta(days=30)
+            
+            to_date_pr = request.query_params.get('to_date', now)
+            from_date_pr = request.query_params.get('from_date', last_month) 
+            all_leads_params = request.query_params.get('all', None)  
+            from_date = datetime.strptime(f"{to_date_pr}", "%Y-%m-%d").strftime("%Y-%m-%dT23:59:00Z")
+            to_date = datetime.strptime(f"{from_date_pr}", "%Y-%m-%d").strftime("%Y-%m-%dT00:00:00Z")  
+            
+            # Geting All Leads
+            if all_leads_params == "all":
+                if request.user.is_admin:
+                    lead = Lead.objects.all()  
+                else:
+                    lead = Lead.objects.filter(LeadRepresentativePrimary=request.user)  
+                serializer = LeadGetSerializer(lead, many=True)
+                return Response(serializer.data)
+            
             else:
-                lead = Lead.objects.filter(LeadRepresentativePrimary=request.user)  
+                if request.user.is_admin:
+                    lead = Lead.objects.filter(Q(LeadDateTime__lt = from_date) & Q(LeadDateTime__gt = to_date)) 
+                else:
+                    lead = Lead.objects.filter(Q(LeadRepresentativePrimary=request.user) & Q(LeadDateTime__lt = from_date) & Q(LeadDateTime__gt = to_date))  
+                serializer = LeadGetSerializer(lead, many=True)
+                return Response(serializer.data)
+            
 
-            serializer = LeadGetSerializer(lead, many=True)
-            return Response(serializer.data)
     def put(self, request, id=None):
         if id is None:
             return Response({"Msg": "Id is None"}, status=status.HTTP_400_BAD_REQUEST)

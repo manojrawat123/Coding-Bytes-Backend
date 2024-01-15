@@ -18,6 +18,9 @@ from convertedstudent.serializers import ConvertedStudentGetRealSerializer
 from feetracer.models import Fee
 from lead.serializer import LeadGetSerializer
 # from feetracer.serializers import FeesSerializerGet
+from datetime import datetime, timedelta
+from django.db.models import Q
+from django.utils import timezone
 
 class FeesRefundApiView(APIView):
     permission_classes = [IsAuthenticated]
@@ -27,10 +30,18 @@ class FeesRefundApiView(APIView):
             serializer = RefundFeesSerializer(customer, many=True)
             return Response(serializer.data)
         else:
+            now = timezone.now().date()
+            last_month = now - timedelta(days=30)
+            to_date_pr = request.query_params.get('to_date', now)
+            from_date_pr = request.query_params.get('from_date', last_month) 
+            all_leads_params = request.query_params.get('all', None)  
+            from_date = datetime.strptime(f"{to_date_pr}", "%Y-%m-%d").strftime("%Y-%m-%dT23:59:00Z")
+            to_date = datetime.strptime(f"{from_date_pr}", "%Y-%m-%d").strftime("%Y-%m-%dT00:00:00Z") 
+
             if request.user.is_admin:
-                fee_refund = FeeRefund.objects.all()
+                fee_refund = FeeRefund.objects.filter(Q(FeeRefundedCreatedDateTime__lt = from_date) & Q(FeeRefundedCreatedDateTime__gt = to_date))
             else:
-                fee_refund = FeeRefund.objects.filter(Representative = request.user)
+                fee_refund = FeeRefund.objects.filter(Q(Representative = request.user) & Q(FeeRefundedCreatedDateTime__lt = from_date) & Q(FeeRefundedCreatedDateTime__gt = to_date))
             serializer = RefundFeesSerializer(fee_refund, many=True)
             for i in serializer.data:
                 fees_data = Fee.objects.filter(converted_id = i["ConvertedID"])   
@@ -40,10 +51,8 @@ class FeesRefundApiView(APIView):
                 pending_fees = total_payment - done_payment
                 i["payment_done"] = done_payment
                 i["pending_fees"] = pending_fees
-                i["total_fees"] = total_payment
-                
-                i["lead_obj"] = LeadGetSerializer(converted_obj.LeadID).data  
-                
+                i["total_fees"] = total_payment                
+                i["lead_obj"] = LeadGetSerializer(converted_obj.LeadID).data                  
             return Response(serializer.data)
  
     def post(self, request):
@@ -52,8 +61,6 @@ class FeesRefundApiView(APIView):
             serializer.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-
 
 class FeesRefundPageDisplayView(APIView):
     permission_classes = [IsAuthenticated]

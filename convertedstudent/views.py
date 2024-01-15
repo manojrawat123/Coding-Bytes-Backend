@@ -14,6 +14,8 @@ from feetracer.models import Fee
 from payment.models import Payment
 from emailshedule.views import custom_email_func 
 from refundfees.models import FeeRefund
+from datetime import datetime, timedelta
+from django.utils import timezone
 
 class ConvertedStudentList(APIView):
     def get(self, request, id=None):
@@ -151,13 +153,20 @@ class RegisterdStudentDetails(APIView):
         if id is not None:
             return Response({"error": "method not allowed"}, status=status.HTTP_405_METHOD_NOT_ALLOWED)
         else:
+            now = timezone.now().date()
+            last_month = now - timedelta(days=30)
+            
+            to_date_pr = request.query_params.get('to_date', now)
+            from_date_pr = request.query_params.get('from_date', last_month) 
+            all_leads_params = request.query_params.get('all', None)  
+            from_date = datetime.strptime(f"{to_date_pr}", "%Y-%m-%d").strftime("%Y-%m-%dT23:59:00Z")
+            to_date = datetime.strptime(f"{from_date_pr}", "%Y-%m-%d").strftime("%Y-%m-%dT00:00:00Z") 
             if request.user.is_admin:
-                myconvertedlist = convertedstudent.objects.all()
+                myconvertedlist = convertedstudent.objects.filter(Q(ConvertedDateTime__lt = from_date) & Q(ConvertedDateTime__gt = to_date))
                 convertedserializer = ConvertedStudentGetSerializer(myconvertedlist, many=True)
                 for i in convertedserializer.data:
                     fees = Fee.objects.filter(lead = i["LeadID"])
                     payment_done = sum(i.fee_received for i in fees)
-                    # print({i["LeadID"]:payment_done})
                     i["payment_done"] = payment_done
                     total_payment_arr = Payment.objects.filter(lead_id = i["LeadID"])
                     total_payment = int(float(i["TotalFee"]))                    
@@ -174,12 +183,11 @@ class RegisterdStudentDetails(APIView):
                     i["lead_obj"] = lead_serializer.data
                 return Response(convertedserializer.data)
             else:
-                myconvertedlist = convertedstudent.objects.filter(Representative = request.user)
+                myconvertedlist = convertedstudent.objects.filter(Q(Representative = request.user) & Q(ConvertedDateTime__lt = from_date) & Q(ConvertedDateTime__gt = to_date))
                 convertedserializer = ConvertedStudentGetSerializer(myconvertedlist, many=True)
                 for i in convertedserializer.data:
                     fees = Fee.objects.filter(lead = i["LeadID"])
                     payment_done = sum(i.fee_received for i in fees)
-                    # print({i["LeadID"]:payment_done})
                     i["payment_done"] = payment_done
                     total_payment = int(float(i["TotalFee"]))
                     i["total_payment"] = total_payment

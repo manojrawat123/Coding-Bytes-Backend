@@ -6,10 +6,10 @@ class FeeRefundAdmin(admin.ModelAdmin):
         'FeeRefunded',
         'FeeRefundedCreatedDateTime',
         'FeeRefundedDateTime',
-        'ReceiptNumber',
-        'UpdatedBY',
-        'Representative',
-        'CustomerStatus',
+        # 'ReceiptNumber',
+        # 'UpdatedBY',
+        # 'Representative',
+        # 'CustomerStatus',
     )
 
 admin.site.register(FeeRefund, FeeRefundAdmin)

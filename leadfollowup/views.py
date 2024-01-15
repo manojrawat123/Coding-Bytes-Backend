@@ -15,6 +15,8 @@ from lead.serializer import LeadSerializer
 from service.models import Service
 from service.serializers import ServiceSerializer
 # from convertedstudent.models import convertedstudent
+from datetime import datetime, timedelta
+from django.utils import timezone
 
 class LeadFollowupListCreateView(APIView):
     permission_classes = [IsAuthenticated]
@@ -32,7 +34,30 @@ class LeadFollowupListCreateView(APIView):
             return Response(serializer.data)
         
         else:
-            leadfollowup = LeadFollowUp.objects.filter(LeadRep = request.user)
+            now = timezone.now().date()
+            last_month = now - timedelta(days=30)
+            
+            to_date_pr = request.query_params.get('to_date', now)
+            from_date_pr = request.query_params.get('from_date', last_month) 
+            follow_status = request.query_params.get('follow_up_status', "all")
+            from_date = datetime.strptime(f"{to_date_pr}", "%Y-%m-%d").strftime("%Y-%m-%dT23:59:00Z")
+            to_date = datetime.strptime(f"{from_date_pr}", "%Y-%m-%d").strftime("%Y-%m-%dT00:00:00Z")
+
+
+    
+            if request.query_params.get("follow_up_status") == "all":
+                if request.user.is_admin:
+                    leadfollowup = LeadFollowUp.objects.filter(Q(LeadStatusDate__lt = from_date) & Q(LeadStatusDate__gt = to_date))
+                else:
+                    leadfollowup = LeadFollowUp.objects.filter(Q(LeadRep = request.user) & Q(LeadStatusDate__lt = from_date) & Q(LeadStatusDate__gt = to_date))
+            else:
+                if request.user.is_admin:
+                    print(follow_status)
+                    leadfollowup = LeadFollowUp.objects.filter(Q(LeadStatusDate__lt = from_date) & Q(LeadStatusDate__gt = to_date) & Q(LeadStatus = follow_status))
+                else:
+                    leadfollowup = LeadFollowUp.objects.filter(Q(LeadRep = request.user) & Q(LeadStatusDate__lt = from_date) & Q(LeadStatusDate__gt = to_date) & Q(LeadStatus = follow_status))
+                
+                
             serializer = LeadGetFollowUpSerializer(leadfollowup, many=True)
             return Response(serializer.data)
  
@@ -76,9 +101,26 @@ class LeadFollowupListCreateView(APIView):
             print(f"ïnternal server error!! -- {e}")
             return Response({"Msg":"Internal Server Error"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
+class LeadAnalystView(APIView):
+    def get(self, request, id=None):
+        if id is not None:
+            return Response({"error": "method Not allowed"}, status=status.HTTP_405_METHOD_NOT_ALLOWED)
+        else:
+            now = timezone.now().date()
+            last_month = now - timedelta(days=30)
+            
+            to_date_pr = request.query_params.get('to_date', now)
+            from_date_pr = request.query_params.get('from_date', last_month) 
+            all_leads_params = request.query_params.get('all', None)  
+            from_date = datetime.strptime(f"{to_date_pr}", "%Y-%m-%d").strftime("%Y-%m-%dT23:59:00Z")
+            to_date = datetime.strptime(f"{from_date_pr}", "%Y-%m-%d").strftime("%Y-%m-%dT00:00:00Z") 
 
-class LeadFollowupDetailView(generics.RetrieveUpdateDestroyAPIView):
-    renderer_classes = [UserRenderer]
-    permission_classes = [IsAuthenticated]
-    queryset = LeadFollowUp.objects.all()
-    serializer_class = LeadFollowupSerializer
+
+            if request.user.is_admin:
+                # lead_analyst = LeadFollowUp.objects.all()
+                lead_analyst = LeadFollowUp.objects.filter(Q(LeadStatusDate__lt = from_date) & Q(LeadStatusDate__gt = to_date)) 
+            else:
+                lead_analyst = LeadFollowUp.objects.filter(Q(LeadRepresentativePrimary=request.user) & Q(LeadStatusDate__lt = from_date) & Q(LeadStatusDate__gt = to_date)) 
+            lead_analyst_serializer = LeadGetFollowUpSerializer(lead_analyst, many=True)
+
+            return Response(lead_analyst_serializer.data, status=status.HTTP_200_OK) 

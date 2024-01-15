@@ -14,12 +14,27 @@ from messageshedule.views import send_sms
 from emailshedule.views import custom_email_func
 from convertedstudent.models import convertedstudent
 from rest_framework.permissions import IsAuthenticated
+from datetime import datetime, timedelta
+from django.utils import timezone
+from django.db.models import Q
+
 
 class PaymentList(APIView):
     permission_classes = [IsAuthenticated]
     def get(self, request, id=None):
         if id is None:
-            payments = Payment.objects.all()
+            now = timezone.now().date()
+            last_month = now - timedelta(days=30)
+            
+            to_date_pr = request.query_params.get('to_date', now)
+            from_date_pr = request.query_params.get('from_date', last_month) 
+            all_leads_params = request.query_params.get('all', None)  
+            from_date = datetime.strptime(f"{to_date_pr}", "%Y-%m-%d").strftime("%Y-%m-%dT23:59:00Z")
+            to_date = datetime.strptime(f"{from_date_pr}", "%Y-%m-%d").strftime("%Y-%m-%dT00:00:00Z")
+            if request.user.is_admin:
+                payments = Payment.objects.filter(Q(payment_date__lt = from_date) & Q(payment_date__gt = to_date))
+            else:
+                payments = Payment.objects.filter(Q(user_id = request.user) &Q(payment_date__lt = from_date) & Q(payment_date__gt = to_date))
             serializer = PaymentGetSerializers(payments, many=True)
             for i in serializer.data:
                 try:
@@ -29,7 +44,6 @@ class PaymentList(APIView):
                 except:
                     fees_data = None
                     i["fees_data"] = False
-                print({i["payment_id"] : fees_data})
             return Response(serializer.data)
         elif id is not None:
             try:

@@ -19,7 +19,7 @@ from myuser.views import UserRegistrationView, MyLogin, MyProfile, UserRegisterV
 from lead.views import LeadAddView, LeadDetailView,LeadFilterView, AddCourseLeadView,AddNewLeadGetApi
 from django.urls import path
 from service.views import ServiceListView, ServiceListById,GetServiceDetailsArrByID
-from leadfollowup.views import LeadFollowupListCreateView, LeadFollowupDetailView
+from leadfollowup.views import LeadFollowupListCreateView,LeadAnalystView
 from payment.views import PaymentList, PaymentDetail,PaymentByLead
 from paymentmode.views import MyPaymentMode
 from paymenttype.views import MyPaymentType, PaymentModeTypeService
@@ -54,6 +54,7 @@ urlpatterns = [
     path('lead/<int:id>/', LeadAddView.as_view(), name='update-lead'),
     path('dashboard/<int:id>/', AddNewLeadGetApi.as_view(), name='dashboard-api'),
     path('brand/<int:id>/', BrandApiViewById.as_view(), name='brand'),
+    path('leadanalyts/',LeadAnalystView.as_view(), name='brand' ),
     # path('lead/<int:pk>/', LeadDetailView.as_view(), name='lead-detail'),
     path('leadfilter/', LeadFilterView.as_view(), name='lead-filter-view'),
     path('leadscource/', LeadScourceApiView.as_view(), name='lead-scource-view'),
