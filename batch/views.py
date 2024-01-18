@@ -20,8 +20,10 @@ class BatchApiView(APIView):
         from_date = datetime.strptime(f"{to_date_pr}", "%Y-%m-%d").strftime("%Y-%m-%dT23:59:00Z")
         to_date = datetime.strptime(f"{from_date_pr}", "%Y-%m-%d").strftime("%Y-%m-%dT00:00:00Z") 
 
-        
-        batch = Batch.objects.filter(Q(BatchCreatedDate__lt = from_date) & Q(BatchCreatedDate__gt = to_date))  
+        if request.user.is_admin:
+            batch = Batch.objects.filter(Q(BatchCreatedDate__lt = from_date) & Q(BatchCreatedDate__gt = to_date))  
+        else:
+            batch = Batch.objects.filter(Q(BatchCreatedDate__lt = from_date) & Q(BatchCreatedDate__gt = to_date) & Q(BatchTeacher = request.user))  
         serializer = BatchSerializers(batch, many=True)
         return Response(serializer.data)
     def post(self, request):

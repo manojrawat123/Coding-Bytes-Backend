@@ -8,6 +8,11 @@ from convertedstudent.models import convertedstudent
 from convertedstudent.serializers import ConvertedStudentGetRealSerializer
 from batch.models import Batch
 from batch.serializers import BatchSerializers
+from datetime import datetime, timedelta
+from django.utils import timezone
+from django.db.models import Q
+
+
 
 class BatchStudentListView(APIView):
     permission_classes = [IsAuthenticated]
@@ -56,18 +61,29 @@ class BatchStudentByConvertedIdView(APIView):
 class BatchForConverted(APIView):
     permission_classes = [IsAuthenticated]
     def get(self, request):
+        now = timezone.now().date()
+        last_month = now - timedelta(days=30)
+        to_date_pr = request.query_params.get('to_date', now)
+        from_date_pr = request.query_params.get('from_date', last_month) 
+        all_leads_params = request.query_params.get('all', None)  
+        from_date = datetime.strptime(f"{to_date_pr}", "%Y-%m-%d").strftime("%Y-%m-%dT23:59:00Z")
+        to_date = datetime.strptime(f"{from_date_pr}", "%Y-%m-%d").strftime("%Y-%m-%dT00:00:00Z")  
         try:
-            convertLead = convertedstudent.objects.all()
-            convert_lead_serializer = ConvertedStudentGetRealSerializer(convertLead, many=True)
             
+            if request.user.is_admin:
+                convertLead = convertedstudent.objects.filter(Q(CreatedDateTime__lt = from_date) & Q(CreatedDateTime__gt = to_date))
+            else:
+                convertLead = convertedstudent.objects.filter(Q(Representative = request.user) &Q(CreatedDateTime__lt = from_date) & Q(CreatedDateTime__gt = to_date))
+            convert_lead_serializer = ConvertedStudentGetRealSerializer(convertLead, many=True)
             for i in convert_lead_serializer.data:
                 try:
                     batchStudent = BatchStudent.objects.get(ConvertedID=i["ConvertedID"])
                     batch_student_serializers = BatchStuByConvertedLead(batchStudent)
+                    
                     i["assign_batch_details"] = batch_student_serializers.data                    
                 except Exception as e:
                     i["assign_batch_details"] = None
-            batch = Batch.objects.all() 
+            batch = Batch.objects.filter(Status = True) 
             batchserializer = BatchSerializers(batch, many=True)
             response_data = {"converted_data": convert_lead_serializer.data,"batch_data": batchserializer.data }
             return Response(response_data, status=status.HTTP_200_OK)

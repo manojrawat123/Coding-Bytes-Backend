@@ -151,7 +151,6 @@ class LeadAddView(APIView):
         else:   
             now = timezone.now().date()
             last_month = now - timedelta(days=30)
-            
             to_date_pr = request.query_params.get('to_date', now)
             from_date_pr = request.query_params.get('from_date', last_month) 
             all_leads_params = request.query_params.get('all', None)  

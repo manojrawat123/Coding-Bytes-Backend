@@ -8,12 +8,13 @@ from paymenttype.models import PaymentType
 from customerstudent.models import Customer
 from payment.models import Payment
 from convertedstudent.models import convertedstudent
+from django.utils import timezone
 
 # Create your models here.
 class Fee(models.Model):
     lead = models.ForeignKey(Lead, on_delete=models.CASCADE)
     fee_received = models.DecimalField(max_digits=10, decimal_places=2)
-    fee_created_datetime = models.DateField()
+    fee_created_datetime = models.DateTimeField(default = timezone.now)
     fee_payment_datetime = models.DateField()
     next_due_date = models.DateField(default="2023-03-03")
     receipt_number = models.CharField(max_length=50)

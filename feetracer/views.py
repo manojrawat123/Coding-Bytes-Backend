@@ -7,6 +7,8 @@ from feetracer.serializers import FeesSerializerGet, FeesSerializerPost
 from rest_framework import generics
 from django.db.models import Q
 from emailshedule.views import custom_email_func
+from datetime import datetime, timedelta
+from django.utils import timezone
 
 
 class FeeTrackerList(APIView):
@@ -17,9 +19,21 @@ class FeeTrackerList(APIView):
             serializer = FeesSerializerGet(customer, many=True)
             return Response(serializer.data)
         else:
-
-            fee = Fee.objects.filter(representative=request.user)
+            now = timezone.now().date()
+            last_month = now - timedelta(days=30)
+            to_date_pr = request.query_params.get('to_date', now)
+            from_date_pr = request.query_params.get('from_date', last_month) 
+            from_date = datetime.strptime(f"{to_date_pr}", "%Y-%m-%d").strftime("%Y-%m-%dT23:59:00Z")
+            to_date = datetime.strptime(f"{from_date_pr}", "%Y-%m-%d").strftime("%Y-%m-%dT00:00:00Z")  
+            if request.user.is_admin:
+                fee = Fee.objects.filter(Q(fee_created_datetime__lt = from_date) & Q(fee_created_datetime__gt = to_date))
+            else:
+                fee = Fee.objects.filter(Q(representative=request.user) & Q(fee_created_datetime__lt = from_date) & Q(fee_created_datetime__gt = to_date))
             serializer = FeesSerializerGet(fee, many=True)
+            for i in serializer.data:
+                fees_data_student = Fee.objects.filter(converted_id = i["converted_id"]["ConvertedID"]).values_list("fee_received", flat=True)
+                paid_fees = sum(i for i in fees_data_student)
+                i["paid_fees"] = paid_fees
             return Response(serializer.data)
  
     def post(self, request):
