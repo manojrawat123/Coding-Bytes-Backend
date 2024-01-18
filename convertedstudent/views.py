@@ -1,7 +1,6 @@
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
-from rest_framework.generics import RetrieveAPIView
 from convertedstudent.models import convertedstudent
 from convertedstudent.serializers import ConvertedStudentSerializer, ConvertedStudentGetSerializer,ConvertedStudentGetRealSerializer
 from django.shortcuts import get_object_or_404
@@ -16,6 +15,7 @@ from emailshedule.views import custom_email_func
 from refundfees.models import FeeRefund
 from datetime import datetime, timedelta
 from django.utils import timezone
+from decimal import Decimal
 
 class ConvertedStudentList(APIView):
     def get(self, request, id=None):
@@ -123,7 +123,7 @@ class ConvertedStudentListWithFeesDetails(APIView):
                     total_payment = int(float(i["TotalFee"]))                    
                     i["total_payment"] = total_payment
                     lost_payment =  float(i["LostSales"]) if i["LostSales"] is not None else 0
-                    i["pending_fees"] = total_payment - payment_done - lost_payment
+                    i["pending_fees"] = Decimal(total_payment) - Decimal(payment_done) - Decimal(lost_payment)
                     lead_obj = Lead.objects.get(id= i["LeadID"])
                     lead_serializer = LeadGetSerializer(lead_obj)
                     i["lead_obj"] = lead_serializer.data
@@ -141,7 +141,7 @@ class ConvertedStudentListWithFeesDetails(APIView):
                     i["total_payment"] = total_payment
                     lost_payment = float(i["LostSales"]) if i["LostSales"] is not None else 0
 
-                    i["pending_fees"] = total_payment - payment_done - lost_payment
+                    i["pending_fees"] = Decimal(total_payment) - Decimal(payment_done) - Decimal(lost_payment)
                     lead_obj = Lead.objects.get(id= i["LeadID"])
                     lead_serializer = LeadGetSerializer(lead_obj)
                     i["lead_obj"] = lead_serializer.data
@@ -158,7 +158,6 @@ class RegisterdStudentDetails(APIView):
             
             to_date_pr = request.query_params.get('to_date', now)
             from_date_pr = request.query_params.get('from_date', last_month) 
-            all_leads_params = request.query_params.get('all', None)  
             from_date = datetime.strptime(f"{to_date_pr}", "%Y-%m-%d").strftime("%Y-%m-%dT23:59:00Z")
             to_date = datetime.strptime(f"{from_date_pr}", "%Y-%m-%d").strftime("%Y-%m-%dT00:00:00Z") 
             if request.user.is_admin:
@@ -171,7 +170,7 @@ class RegisterdStudentDetails(APIView):
                     total_payment_arr = Payment.objects.filter(lead_id = i["LeadID"])
                     total_payment = int(float(i["TotalFee"]))                    
                     i["total_payment"] = total_payment
-                    i["pending_fees"] = total_payment - payment_done
+                    i["pending_fees"] = Decimal(total_payment) - Decimal(payment_done)
                     refund_fees = FeeRefund.objects.filter(ConvertedID = i["ConvertedID"])
                     if len(refund_fees) == 0:
                         i["fees_refund"] = 0
@@ -191,7 +190,7 @@ class RegisterdStudentDetails(APIView):
                     i["payment_done"] = payment_done
                     total_payment = int(float(i["TotalFee"]))
                     i["total_payment"] = total_payment
-                    i["pending_fees"] = total_payment - payment_done
+                    i["pending_fees"] = Decimal(total_payment) - Decimal(payment_done)
                     
                     refund_fees = FeeRefund.objects.filter(ConvertedID = i["ConvertedID"])
                     if len(refund_fees) == 0:
